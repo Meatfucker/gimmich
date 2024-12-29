@@ -1,3 +1,5 @@
+![gimmich](/gimmich-screenshot.png)
+
 # gimmich
 
 gimmich is a GUI frontend to immich-cli and immich to make bulk uploading to your image server easy.
