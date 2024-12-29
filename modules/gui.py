@@ -5,6 +5,66 @@ import tkinter as tk
 from tkinter import filedialog
 
 
+class CheckboxFrame(ctk.CTkFrame):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        # Variables for checkboxes
+        self.recursive = ctk.BooleanVar(value=False)
+        self.names_as_albums = ctk.BooleanVar(value=False)
+        self.skip_hash = ctk.BooleanVar(value=False)
+        self.include_hidden = ctk.BooleanVar(value=False)
+        self.dry_run = ctk.BooleanVar(value=False)
+        self.delete_local = ctk.BooleanVar(value=False)
+        self.album_input_enabled = ctk.BooleanVar(value=False)
+        self.album_input_field = ctk.StringVar(value="Enter Album Name")
+
+        # Checkboxes
+        self.recursive = ctk.CTkCheckBox(self, text="Recursive", variable=self.recursive)
+        self.recursive.grid(row=0, column=0, pady=5, padx=5, sticky="w")
+        self.names_as_albums = ctk.CTkCheckBox(self, text="Directory names as albums", variable=self.names_as_albums)
+        self.names_as_albums.grid(row=1, column=0, pady=5, padx=5, sticky="w")
+        self.skip_hash = ctk.CTkCheckBox(self, text="Skip Hash", variable=self.skip_hash)
+        self.skip_hash.grid(row=2, column=0, pady=5, padx=5, sticky="w")
+        self.include_hidden = ctk.CTkCheckBox(self, text="Include Hidden", variable=self.include_hidden)
+        self.include_hidden.grid(row=3, column=0, pady=5, padx=5, sticky="w")
+        self.dry_run = ctk.CTkCheckBox(self, text="Dry Run", variable=self.dry_run)
+        self.dry_run.grid(row=4, column=0, pady=5, padx=5, sticky="w")
+        self.delete_local = ctk.CTkCheckBox(self, text="Delete Local Files", variable=self.delete_local)
+        self.delete_local.grid(row=5, column=0, pady=5, padx=5, sticky="w")
+        self.album_input = ctk.CTkCheckBox(self, text="Album Name", variable=self.album_input_enabled)
+        self.album_input.grid(row=6, column=0, pady=5, padx=5, sticky="w")
+        self.album_input_entry = ctk.CTkEntry(self, textvariable=self.album_input_field)
+        self.album_input_entry.grid(row=7, column=0, pady=5, padx=5)
+
+    def get_states(self):
+        """Returns the states of all checkboxes as a dictionary."""
+        return {
+            "recursive": self.recursive.get(),
+            "directory_names_as_albums": self.names_as_albums.get(),
+            "skip_hash": self.skip_hash.get(),
+            "include_hidden": self.include_hidden.get(),
+            "dry_run": self.dry_run.get(),
+            "delete_local": self.delete_local.get(),
+            "album_input_enabled": self.album_input_enabled.get(),
+            "album_input": self.album_input_field.get(),
+        }
+
+
+class ConsoleOutput:
+
+    def __init__(self, text_widget):
+        self.text_widget = text_widget
+        self.text_widget.configure(state="normal")
+
+    def write(self, message):
+        self.text_widget.insert("end", message)
+        self.text_widget.see("end")  # Auto-scroll to the end
+
+    def flush(self):
+        pass  # Required for compatibility with sys.stdout
+
+
 class InfoFrame(ctk.CTkFrame):
     def __init__(self, parent, path_list, checkbox_states):
         super().__init__(parent)
@@ -111,52 +171,6 @@ class InfoFrame(ctk.CTkFrame):
         except Exception as e:
             print(f"Unexpected error Uploading: {e}")
         print("Upload Clicked!")
-
-
-class CheckboxFrame(ctk.CTkFrame):
-    def __init__(self, parent):
-        super().__init__(parent)
-
-        # Variables for checkboxes
-        self.recursive = ctk.BooleanVar(value=False)
-        self.names_as_albums = ctk.BooleanVar(value=False)
-        self.skip_hash = ctk.BooleanVar(value=False)
-        self.include_hidden = ctk.BooleanVar(value=False)
-        self.dry_run = ctk.BooleanVar(value=False)
-        self.delete_local = ctk.BooleanVar(value=False)
-        self.album_input_enabled = ctk.BooleanVar(value=False)
-        self.album_input_field = ctk.StringVar(value="Enter Album Name")
-
-        # Checkboxes
-        self.recursive = ctk.CTkCheckBox(self, text="Recursive", variable=self.recursive)
-        self.recursive.grid(row=0, column=0, pady=5, padx=5, sticky="w")
-        self.names_as_albums = ctk.CTkCheckBox(self, text="Directory names as albums", variable=self.names_as_albums)
-        self.names_as_albums.grid(row=1, column=0, pady=5, padx=5, sticky="w")
-        self.skip_hash = ctk.CTkCheckBox(self, text="Skip Hash", variable=self.skip_hash)
-        self.skip_hash.grid(row=2, column=0, pady=5, padx=5, sticky="w")
-        self.include_hidden = ctk.CTkCheckBox(self, text="Include Hidden", variable=self.include_hidden)
-        self.include_hidden.grid(row=3, column=0, pady=5, padx=5, sticky="w")
-        self.dry_run = ctk.CTkCheckBox(self, text="Dry Run", variable=self.dry_run)
-        self.dry_run.grid(row=4, column=0, pady=5, padx=5, sticky="w")
-        self.delete_local = ctk.CTkCheckBox(self, text="Delete Local Files", variable=self.delete_local)
-        self.delete_local.grid(row=5, column=0, pady=5, padx=5, sticky="w")
-        self.album_input = ctk.CTkCheckBox(self, text="Album Name", variable=self.album_input_enabled)
-        self.album_input.grid(row=6, column=0, pady=5, padx=5, sticky="w")
-        self.album_input_entry = ctk.CTkEntry(self, textvariable=self.album_input_field)
-        self.album_input_entry.grid(row=7, column=0, pady=5, padx=5)
-
-    def get_states(self):
-        """Returns the states of all checkboxes as a dictionary."""
-        return {
-            "recursive": self.recursive.get(),
-            "directory_names_as_albums": self.names_as_albums.get(),
-            "skip_hash": self.skip_hash.get(),
-            "include_hidden": self.include_hidden.get(),
-            "dry_run": self.dry_run.get(),
-            "delete_local": self.delete_local.get(),
-            "album_input_enabled": self.album_input_enabled.get(),
-            "album_input": self.album_input_field.get(),
-        }
 
 
 class LoginFrame(ctk.CTkFrame):
