@@ -1,4 +1,5 @@
 import shutil
+import threading
 import subprocess
 import customtkinter as ctk
 import tkinter as tk
@@ -135,42 +136,48 @@ class InfoFrame(ctk.CTkFrame):
                 self.immich_url = None
 
     def upload_images(self):
-        try:
-            checkbox_states = self.checkbox_states
-            # Build the command
-            compiled_run_list = [self.immich_command, "upload"] + self.path_list
-            if checkbox_states["album_input_enabled"]:
-                compiled_run_list += ["--album-name", checkbox_states["album_input"]]
-            if checkbox_states["recursive"]:
-                compiled_run_list += ["--recursive"]
-            if checkbox_states["directory_names_as_albums"]:
-                compiled_run_list += ["--album"]
-            if checkbox_states["skip_hash"]:
-                compiled_run_list += ["--skip-hash"]
-            if checkbox_states["include_hidden"]:
-                compiled_run_list += ["--include-hidden"]
-            if checkbox_states["dry_run"]:
-                compiled_run_list += ["--dry-run"]
-            if checkbox_states["delete_local"]:
-                compiled_run_list += ["--delete"]
-            print(compiled_run_list)
+        def run_subprocess():
+            try:
+                checkbox_states = self.checkbox_states
+                # Build the command
+                compiled_run_list = [self.immich_command, "upload"] + self.path_list
+                if checkbox_states["album_input_enabled"]:
+                    compiled_run_list += ["--album-name", checkbox_states["album_input"]]
+                if checkbox_states["recursive"]:
+                    compiled_run_list += ["--recursive"]
+                if checkbox_states["directory_names_as_albums"]:
+                    compiled_run_list += ["--album"]
+                if checkbox_states["skip_hash"]:
+                    compiled_run_list += ["--skip-hash"]
+                if checkbox_states["include_hidden"]:
+                    compiled_run_list += ["--include-hidden"]
+                if checkbox_states["dry_run"]:
+                    compiled_run_list += ["--dry-run"]
+                if checkbox_states["delete_local"]:
+                    compiled_run_list += ["--delete"]
+                print(compiled_run_list)
 
-            process = subprocess.Popen(
-                compiled_run_list,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                bufsize=1
-            )
-            # Read output line by line and display it
-            for line in iter(process.stdout.readline, ''):
-                print(line.strip())  # Redirect output to your custom console
-            process.stdout.close()
-            process.wait()
+                process = subprocess.Popen(
+                    compiled_run_list,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    bufsize=1
+                )
+                # Read output line by line and display it
+                for line in iter(process.stdout.readline, ''):
+                    print(line.strip())  # Redirect output to your custom console
+                process.stdout.close()
+                process.wait()
 
-        except Exception as e:
-            print(f"Unexpected error Uploading: {e}")
-        print("Upload Clicked!")
+            except Exception as e:
+                print(f"Unexpected error Uploading: {e}")
+            print("Upload Completed!")
+
+        # Run the subprocess in a separate thread
+        upload_thread = threading.Thread(target=run_subprocess)
+        upload_thread.daemon = True  # Allow thread to exit when main program exits
+        upload_thread.start()
 
 
 class LoginFrame(ctk.CTkFrame):
