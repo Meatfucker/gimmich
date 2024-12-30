@@ -17,7 +17,7 @@ class GimmichApp(ctk.CTk):
         self.top_frame = ctk.CTkFrame(self.main_frame)  # Frame for buttons and info
         self.top_frame.grid(row=0, column=0, padx=5, pady=5, sticky="new")
 
-        self.console_text = ctk.CTkTextbox(self.main_frame, wrap="word")  # Console log
+        self.console_text = ctk.CTkTextbox(self.main_frame, wrap="word", height=400)  # Console log
         self.console_text.grid(row=2, column=0, padx=5, pady=5, sticky="sew")
         sys.stdout = ConsoleOutput(self.console_text)  # Redirect console output to the Text widget
 
