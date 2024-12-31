@@ -15,3 +15,7 @@ gimmich is a GUI frontend to immich-cli and immich to make bulk uploading to you
 
 Download or clone this repo using git. `git clone https://github.com/Meatfucker/gimmich`
 Run `python gimmich.py`
+
+## TODO
+
+Add native API support to remove dependence on immich-cli.

@@ -65,13 +65,27 @@ class ConsoleOutput:
     def flush(self):
         pass  # Required for compatibility with sys.stdout
 
+class InfoProgressBarFrame(ctk.CTkFrame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.configure(width=250, height=300)
+        self.pack_propagate(False)
+        self.progressbar_status = ctk.StringVar(value="Uploading Files...")
+        self.progressbar_label = ctk.CTkLabel(self, textvariable=self.progressbar_status)
+        self.progressbar_label.pack(padx=5, pady=5, side="bottom")
+        self.upload_progressbar = ctk.CTkProgressBar(master=self, mode="indeterminate", height=20)
+        self.upload_progressbar.pack(padx=5, pady=5, side="bottom")
+
 
 class InfoFrame(ctk.CTkFrame):
-    def __init__(self, parent, path_list, checkbox_frame):
+    def __init__(self, parent, path_list, checkbox_frame, progressbar_frame):
         super().__init__(parent)
+        self.configure(width=250, height=300)
+        self.pack_propagate(False)
         self.immich_command = shutil.which("immich")
         self.path_list = path_list
         self.checkbox_frame = checkbox_frame
+        self.progressbar_frame = progressbar_frame
         self.logged_in_status = ctk.StringVar(value="Logged in: False")  # Logged-in status label
         self.logged_in_label = ctk.CTkLabel(self, textvariable=self.logged_in_status)
         self.logged_in_label.pack(pady=5)
@@ -174,7 +188,10 @@ class InfoFrame(ctk.CTkFrame):
             except Exception as e:
                 print(f"Unexpected error Uploading: {e}")
             print("Upload Completed!")
-
+            self.tkraise()
+            self.progressbar_frame.upload_progressbar.stop()
+        self.progressbar_frame.tkraise()
+        self.progressbar_frame.upload_progressbar.start()
         # Run the subprocess in a separate thread
         upload_thread = threading.Thread(target=run_subprocess)
         upload_thread.daemon = True  # Allow thread to exit when main program exits

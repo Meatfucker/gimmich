@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import sys
-from modules.gui import LoginFrame, PathFrame, CheckboxFrame, InfoFrame, ConsoleOutput
+from modules.gui import LoginFrame, PathFrame, CheckboxFrame, InfoFrame, ConsoleOutput, InfoProgressBarFrame
 
 
 # Redirect console output to a Text widget
@@ -29,8 +29,11 @@ class GimmichApp(ctk.CTk):
         self.checkbox_frame.grid(row=1, column=3, padx=5, pady=5, sticky="ns")
         self.checkbox_states = self.checkbox_frame.get_states()
 
-        self.info_frame = InfoFrame(self.top_frame, self.path_list, self.checkbox_frame)  # Info frame
-        self.info_frame.grid(row=1, column=4, padx=5, pady=5, sticky="nse")
+        self.info_progressbar_frame = InfoProgressBarFrame(self.top_frame)
+        self.info_progressbar_frame.grid(row=1, column=4, padx=5, pady=5)
+
+        self.info_frame = InfoFrame(self.top_frame, self.path_list, self.checkbox_frame, self.info_progressbar_frame)
+        self.info_frame.grid(row=1, column=4, padx=5, pady=5)
 
         self.login_frame = LoginFrame(self.top_frame, self.info_frame)  # Login frame
         self.login_frame.grid(row=1, column=1, padx=5, pady=5, sticky="nsw")
