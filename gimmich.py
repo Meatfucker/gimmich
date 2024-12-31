@@ -29,7 +29,7 @@ class GimmichApp(ctk.CTk):
         self.checkbox_frame.grid(row=1, column=3, padx=5, pady=5, sticky="ns")
         self.checkbox_states = self.checkbox_frame.get_states()
 
-        self.info_frame = InfoFrame(self.top_frame, self.path_list, self.checkbox_states)  # Info frame
+        self.info_frame = InfoFrame(self.top_frame, self.path_list, self.checkbox_frame)  # Info frame
         self.info_frame.grid(row=1, column=4, padx=5, pady=5, sticky="nse")
 
         self.login_frame = LoginFrame(self.top_frame, self.info_frame)  # Login frame

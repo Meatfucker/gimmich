@@ -67,11 +67,11 @@ class ConsoleOutput:
 
 
 class InfoFrame(ctk.CTkFrame):
-    def __init__(self, parent, path_list, checkbox_states):
+    def __init__(self, parent, path_list, checkbox_frame):
         super().__init__(parent)
         self.immich_command = shutil.which("immich")
         self.path_list = path_list
-        self.checkbox_states = checkbox_states
+        self.checkbox_frame = checkbox_frame
         self.logged_in_status = ctk.StringVar(value="Logged in: False")  # Logged-in status label
         self.logged_in_label = ctk.CTkLabel(self, textvariable=self.logged_in_status)
         self.logged_in_label.pack(pady=5)
@@ -138,7 +138,8 @@ class InfoFrame(ctk.CTkFrame):
     def upload_images(self):
         def run_subprocess():
             try:
-                checkbox_states = self.checkbox_states
+                checkbox_states = self.checkbox_frame.get_states()
+                print(checkbox_states)
                 # Build the command
                 compiled_run_list = [self.immich_command, "upload"] + self.path_list
                 if checkbox_states["album_input_enabled"]:
