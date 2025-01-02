@@ -2,14 +2,14 @@
 
 # gimmich
 
-gimmich is a GUI frontend to immich-cli and immich to make bulk uploading to your image server easy.
+gimmich is a GUI frontend for immich to make bulk uploading to your image server easy.
 
 
 ## Requirements
 
-- immich-cli available here: https://immich.app/docs/features/command-line-interface/
 - Python 3.12
-- customtkinter which can be acquired via `pip install customtkinter`
+- customtkinter `pip install customtkinter`
+- keyring `pip install keyring`
 
 ## Installation
 
@@ -18,4 +18,4 @@ Run `python gimmich.py`
 
 ## TODO
 
-Add native API support to remove dependence on immich-cli.
+Graceful handling of errors. Currently they will always stop the upload process
