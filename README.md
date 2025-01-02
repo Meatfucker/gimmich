@@ -4,6 +4,11 @@
 
 gimmich is a GUI frontend for immich to make bulk uploading to your image server easy.
 
+- Immich API based
+- Supports multiple paths at once
+- Securely stores credential info between sessions
+- Can create albums based on user specified label and/or based on the directory name
+
 
 ## Requirements
 
