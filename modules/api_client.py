@@ -93,13 +93,31 @@ class ImmichClient:
             self.logged_in = False
             print(f"Error getting user. {e}")
 
-    def create_album(self, album_name, ids):
+    def get_all_albums(self):
+        """Returns a list of all album names and associated ids"""
+        url = f"{self.base_url}/api/albums"
+        payload = {}
+        headers = {
+            'Accept': 'application/json',
+            'x-api-key': self.token
+        }
+        try:
+            response = requests.request("GET", url, headers=headers, data=payload)
+            if response.status_code == 200:
+                albums = response.json()
+                album_dict = {album['albumName']: album['id'] for album in albums}
+                return album_dict
+            else:
+                print("Error accessing album API")
+        except Exception as e:
+            print(f"Error getting album list: {e}")
+
+    def create_album(self, album_name):
         """Creates an album"""
         url = f"{self.base_url}/api/albums"
         payload = json.dumps({
             'albumName': album_name,
             'albumUsers': [{'role': 'viewer', 'userId': self.user_id}],
-            'assetIds': ids
         })
         headers = {
             'Content-Type': 'application/json',
@@ -109,11 +127,31 @@ class ImmichClient:
         try:
             response = requests.request("POST", url, headers=headers, data=payload)
             if response.status_code in [200, 201]:
-                print(f"Album created: {album_name}")
+                response_data = response.json()
+                album_id = response_data.get('id')  # Extract the 'id' field
+                return album_id
             else:
-                print("Error creating album")
+                print(f"Error creating album {album_name}")
         except Exception as e:
             print(f"Error accessing album API: {e}")
+
+    def add_assets_to_album(self, album_id, asset_ids):
+        """Takes an album id and a list of asset ids then adds them to the album"""
+        url = f"{self.base_url}/api/albums/{album_id}/assets"
+        payload = json.dumps({
+            'ids': asset_ids
+        })
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'x-api-key': self.token
+        }
+        try:
+            response = requests.request("PUT", url, headers=headers, data=payload)
+            if response.status_code != 200:
+                print (f"Error adding assets to album {album_id}")
+        except Exception as e:
+            print(f"Error accessing addAssetsToAlbum API: {e}")
 
     def upload_asset(self, file):
         """Uploads a single asset, hashing an AssetId for it. Returning the immich id and upload status"""
@@ -139,7 +177,6 @@ class ImmichClient:
             if response.status_code in [200, 201]:
 
                 response_data = response.json()
-                print(f'Uploaded {file}')
                 asset_id = response_data.get('id')
                 status = response_data.get('status')
                 return asset_id, status

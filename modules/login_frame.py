@@ -1,5 +1,4 @@
 import customtkinter as ctk
-from modules.tooltip_frame import Tooltip
 
 
 class LoginFrame(ctk.CTkFrame):
@@ -10,11 +9,9 @@ class LoginFrame(ctk.CTkFrame):
         # Login URL Entry
         self.login_url = ctk.CTkEntry(self, placeholder_text="Enter base Immich URL", width=350)
         self.login_url.grid(row=0, column=0, pady=5, padx=5)
-        Tooltip(self.login_url, "http://example.com:1337")
         # Login API Key Entry
         self.login_key = ctk.CTkEntry(self, placeholder_text="Enter API key", width=350)
         self.login_key.grid(row=1, column=0, pady=5, padx=5)
-        Tooltip(self.login_key, "This is an API key generated from the user settings panel in Immich")
         # Login Button
         self.login_button = ctk.CTkButton(self, text="Login", command=self.login_action, width=350)
         self.login_button.grid(row=2, column=0, pady=5, padx=5)

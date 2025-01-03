@@ -25,6 +25,12 @@ class UploadFrame(ctk.CTkFrame):
         self.upload_progressbar = ctk.CTkProgressBar(master=self, mode="determinate", height=20)
         self.upload_progressbar.grid(row=5, padx=5, pady=5)
         self.upload_progressbar.set(0)
+        self.album_button = ctk.CTkButton(self, text="get all albums", command=self.get_albums)
+        self.album_button.grid(row=6, pady=5, sticky="ew")
+
+    def get_albums(self):
+        albums = self.client.get_all_albums()
+        print(albums)
 
     def upload_images(self):
         """Upload each file in a non-blocking manner, presenting a progressbar"""
@@ -55,7 +61,7 @@ class UploadFrame(ctk.CTkFrame):
                 print(f"Status: {status}")
                 directory = os.path.dirname(file)
                 immediate_dir = os.path.basename(directory)
-                collected_ids.append((asset_id, immediate_dir))
+                collected_ids.append((immediate_dir, asset_id))
                 progress = (index + 1) / total_files
                 self.upload_progressbar.set(progress)  # Update progress bar
                 self.progressbar_status.set(f"Uploading... {index + 1}/{total_files} files")
@@ -84,18 +90,33 @@ class UploadFrame(ctk.CTkFrame):
 
     def process_albums(self, ids):
         """Create albums based on user options"""
-        single_album_ids = [asset_id for asset_id, _ in ids]
         checkbox_states = self.checkbox_frame.get_states()
+        existing_albums = self.client.get_all_albums()
+        all_asset_ids = [value for _, value in ids]
         if checkbox_states['album_input_enabled']:
-            self.client.create_album(checkbox_states['album_input'],  single_album_ids)
+            if checkbox_states['album_input'] not in existing_albums:
+                album_id = self.client.create_album(checkbox_states['album_input'])
+                self.client.add_assets_to_album(album_id, all_asset_ids)
+                print(f"Created album {checkbox_states['album_input']}, id:{album_id}")
+            else:
+                album_id = existing_albums[checkbox_states['album_input']]
+                self.client.add_assets_to_album(album_id, all_asset_ids)
+                print(f"Album {checkbox_states['album_input']} already exists, added to existing album: {album_id}")
         if checkbox_states['directory_names_as_albums']:
             albums_by_directory = {}
-            for asset_id, directory_name in ids:
+            for directory_name, asset_id in ids:
                 albums_by_directory.setdefault(directory_name, []).append(asset_id)
 
             for directory_name, asset_ids in albums_by_directory.items():
-                # Create an album for each directory
-                self.client.create_album(directory_name, asset_ids)
+                #  Check if the album exists and if not, create an album for each directory
+                if directory_name not in existing_albums:
+                    album_id = self.client.create_album(directory_name)
+                    self.client.add_assets_to_album(album_id, all_asset_ids)
+                    print(f"Created album {directory_name}, id:{album_id}")
+                else:
+                    album_id = existing_albums[directory_name]
+                    self.client.add_assets_to_album(album_id, all_asset_ids)
+                    print(f"Album {directory_name} already exists, added assets to existing album: {album_id}")
 
     def stop_upload(self):
         """Signal to stop the upload process."""
