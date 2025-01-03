@@ -4,6 +4,7 @@ import uuid
 import hashlib
 import os
 import json
+import time
 from datetime import datetime
 import keyring
 
@@ -112,6 +113,25 @@ class ImmichClient:
         except Exception as e:
             print(f"Error accessing getAllAlbums API: {e}")
 
+    def get_all_tags(self):
+        """Returns a list of all tag names and associated ids"""
+        url = f"{self.base_url}/api/tags"
+        payload = {}
+        headers = {
+            'Accept': 'application/json',
+            'x-api-key': self.token
+        }
+        try:
+            response = requests.request("GET", url, headers=headers, data=payload)
+            if response.status_code == 200:
+                tags = response.json()
+                tag_dict = {tag['name']: tag['id'] for tag in tags}
+                return tag_dict
+            else:
+                print("Error getting tag list")
+        except Exception as e:
+            print(f"Error accessing getAllTags API: {e}")
+
     def create_album(self, album_name):
         """Creates an album"""
         url = f"{self.base_url}/api/albums"
@@ -135,11 +155,29 @@ class ImmichClient:
         except Exception as e:
             print(f"Error accessing createAlbum API: {e}")
 
+    def add_assets_to_album(self, album_id, asset_ids):
+        """Takes an album id and a list of asset ids then adds them to the album"""
+        url = f"{self.base_url}/api/albums/{album_id}/assets"
+        payload = json.dumps({
+            'ids': asset_ids
+        })
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'x-api-key': self.token
+        }
+        try:
+            response = requests.request("PUT", url, headers=headers, data=payload)
+            if response.status_code != 200:
+                print(f"Error adding assets to album {album_id}")
+        except Exception as e:
+            print(f"Error accessing addAssetsToAlbum API: {e}")
+
     def create_tag(self, tag_name):
         """Creates an album"""
         url = f"{self.base_url}/api/tags"
         payload = json.dumps({
-            'Name': tag_name,
+            'name': tag_name,
         })
         headers = {
             'Content-Type': 'application/json',

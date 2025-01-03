@@ -68,6 +68,7 @@ class UploadFrame(ctk.CTkFrame):
 
             if collected_ids:
                 self.process_albums(collected_ids)
+                self.process_tags(collected_ids)
 
         except Exception as e:
             print(f"Unexpected error Uploading: {e}")
@@ -118,6 +119,36 @@ class UploadFrame(ctk.CTkFrame):
                     album_id = existing_albums[directory_name]
                     self.client.add_assets_to_album(album_id, all_asset_ids)
                     print(f"Album {directory_name} already exists, added assets to existing album: {album_id}")
+
+    def process_tags(self, ids):
+        """Create tags based on user options"""
+        checkbox_states = self.checkbox_frame.get_states()
+        existing_tags = self.client.get_all_tags()
+        all_asset_ids = [value for _, value in ids]
+        if checkbox_states['tag_input_enabled']:
+            if checkbox_states['tag_input'] not in existing_tags:
+                tag_id = self.client.create_tag(checkbox_states['tag_input'])
+                self.client.tag_assets(tag_id, all_asset_ids)
+                print(f"Created tag {checkbox_states['tag_input']}, id:{tag_id}")
+            else:
+                tag_id = existing_tags[checkbox_states['tag_input']]
+                self.client.tag_assets(tag_id, all_asset_ids)
+                print(f"Tag {checkbox_states['album_input']} already exists, added to existing tag: {tag_id}")
+        if checkbox_states['directory_names_as_tags']:
+            tags_by_directory = {}
+            for directory_name, asset_id in ids:
+                tags_by_directory.setdefault(directory_name, []).append(asset_id)
+
+            for directory_name, asset_ids in tags_by_directory.items():
+                #  Check if the tag exists and if not, create a tag for each directory
+                if directory_name not in existing_tags:
+                    tag_id = self.client.create_tag(directory_name)
+                    self.client.tag_assets(tag_id, all_asset_ids)
+                    print(f"Created tag {directory_name}, id:{tag_id}")
+                else:
+                    tag_id = existing_tags[directory_name]
+                    self.client.tag_assets(tag_id, all_asset_ids)
+                    print(f"Tag {directory_name} already exists, added assets to existing tag: {tag_id}")
 
     def stop_upload(self):
         """Signal to stop the upload process."""

@@ -23,5 +23,5 @@ Run `python gimmich.py`
 
 ## TODO
 
-Add bulk tagging options for uploads
+Add option to import captions as descriptions
 Add bulk downloading tab with various criteria to bulk download assets
