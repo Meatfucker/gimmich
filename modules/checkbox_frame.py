@@ -20,7 +20,6 @@ class CheckboxFrame(ctk.CTkFrame):
         self.album_input_entry = ctk.CTkEntry(self, placeholder_text="Enter Album Name")
         self.album_input_entry.grid(row=3, column=0, pady=5, padx=5)
 
-
     def get_states(self):
         """Returns the states of all checkboxes as a dictionary."""
         return {
