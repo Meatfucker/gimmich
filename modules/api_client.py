@@ -126,7 +126,7 @@ class ImmichClient:
         }
         try:
             response = requests.request("POST", url, headers=headers, data=payload)
-            if response.status_code in [200, 201]:
+            if response.status_code == 201:
                 response_data = response.json()
                 album_id = response_data.get('id')  # Extract the 'id' field
                 return album_id
@@ -149,7 +149,7 @@ class ImmichClient:
         try:
             response = requests.request("PUT", url, headers=headers, data=payload)
             if response.status_code != 200:
-                print (f"Error adding assets to album {album_id}")
+                print(f"Error adding assets to album {album_id}")
         except Exception as e:
             print(f"Error accessing addAssetsToAlbum API: {e}")
 
@@ -174,7 +174,7 @@ class ImmichClient:
         }
         try:
             response = requests.request("POST", url, headers=headers, files=files)
-            if response.status_code in [200, 201]:
+            if response.status_code == 201:
 
                 response_data = response.json()
                 asset_id = response_data.get('id')
