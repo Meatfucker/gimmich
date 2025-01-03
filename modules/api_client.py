@@ -172,18 +172,27 @@ class ImmichClient:
             'Accept': 'application/json',
             'x-api-key': self.token
         }
-        try:
-            response = requests.request("POST", url, headers=headers, files=files)
-            if response.status_code == 201:
+        attempt = 0
+        while attempt < 3:
+            try:
+                response = requests.request("POST", url, headers=headers, files=files)
+                if response.status_code == 201:
 
-                response_data = response.json()
-                asset_id = response_data.get('id')
-                status = response_data.get('status')
-                return asset_id, status
+                    response_data = response.json()
+                    asset_id = response_data.get('id')
+                    status = response_data.get('status')
+                    return asset_id, status
+                else:
+                    print(f'Error uploading {file}')
+            except Exception as e:
+                print(f'Error accessing upload API: {e}')
+            # Retry logic: wait before the next attempt
+            attempt += 1
+            if attempt < 3:
+                print(f"Retrying in 2 seconds...")
+                time.sleep(2)
             else:
-                print(f'Error uploading {file}')
-        except Exception as e:
-            print(f'Error accessing upload API: {e}')
+                print(f"Max retries reached for {file}")
 
     @staticmethod
     def get_device_id():

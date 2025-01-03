@@ -26,8 +26,6 @@ class UploadFrame(ctk.CTkFrame):
         self.upload_progressbar = ctk.CTkProgressBar(master=self, mode="determinate", height=20)
         self.upload_progressbar.grid(row=5, padx=5, pady=5)
         self.upload_progressbar.set(0)
-        self.album_button = ctk.CTkButton(self, text="get all albums", command=self.get_albums)
-        self.album_button.grid(row=6, pady=5, sticky="ew")
 
     def get_albums(self):
         albums = self.client.get_all_albums()
@@ -60,6 +58,7 @@ class UploadFrame(ctk.CTkFrame):
                 print(f"Uploading {file} ({index + 1}/{len(self.file_list)})")
                 asset_id, status = self.client.upload_asset(file)
                 print(f"Status: {status}")
+
                 directory = os.path.dirname(file)
                 immediate_dir = os.path.basename(directory)
                 collected_ids.append((immediate_dir, asset_id))
