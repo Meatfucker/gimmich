@@ -58,7 +58,7 @@ class UploadFrame(ctk.CTkFrame):
                 print(f"Uploading {file} ({index + 1}/{len(self.file_list)})")
                 asset_id, status = self.client.upload_asset(file)
                 print(f"Status: {status}")
-
+                self.process_caption(file, asset_id)
                 directory = os.path.dirname(file)
                 immediate_dir = os.path.basename(directory)
                 collected_ids.append((immediate_dir, asset_id))
@@ -89,6 +89,18 @@ class UploadFrame(ctk.CTkFrame):
             self.file_list = self.path_frame.get_files_from_paths(recursive=True)
         else:
             self.file_list = self.path_frame.get_files_from_paths(recursive=False)
+
+    def process_caption(self, file, asset_id):
+        checkbox_states = self.checkbox_frame.get_states()
+        if checkbox_states['import_captions']:
+            txt_file = os.path.splitext(file)[0] + '.txt'
+            if os.path.exists(txt_file):
+                with open(txt_file, 'r', encoding='utf-8') as f:
+                    caption = f.read()
+                self.client.update_asset_description(asset_id, caption)
+                print(f"Added caption for {file}")
+            else:
+                print(f"No caption file found for: {file}")
 
     def process_albums(self, ids):
         """Create albums based on user options"""

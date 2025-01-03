@@ -133,7 +133,7 @@ class ImmichClient:
             print(f"Error accessing getAllTags API: {e}")
 
     def create_album(self, album_name):
-        """Creates an album"""
+        """Creates an album, returning the album id"""
         url = f"{self.base_url}/api/albums"
         payload = json.dumps({
             'albumName': album_name,
@@ -174,7 +174,7 @@ class ImmichClient:
             print(f"Error accessing addAssetsToAlbum API: {e}")
 
     def create_tag(self, tag_name):
-        """Creates an album"""
+        """Creates a tag, returning the tag id"""
         url = f"{self.base_url}/api/tags"
         payload = json.dumps({
             'name': tag_name,
@@ -196,7 +196,7 @@ class ImmichClient:
             print(f"Error accessing createTag API: {e}")
 
     def tag_assets(self, tag_id, asset_ids):
-        """Takes an album id and a list of asset ids then adds them to the album"""
+        """Takes a tag id and a list of asset ids then adds them to the tag"""
         url = f"{self.base_url}/api/tags/{tag_id}/assets"
         payload = json.dumps({
             'ids': asset_ids
@@ -212,6 +212,24 @@ class ImmichClient:
                 print(f"Error tagging assets with tag: {tag_id}")
         except Exception as e:
             print(f"Error accessing tagAssets API: {e}")
+
+    def update_asset_description(self, asset_id, asset_description):
+        """Updates an asset with the supplied description"""
+        url = f"{self.base_url}/api/assets/{asset_id}"
+        payload = json.dumps({
+            'description': asset_description
+        })
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'x-api-key': self.token
+        }
+        try:
+            response = requests.request("PUT", url, headers=headers, data=payload)
+            if response.status_code != 200:
+                print(f"Error adding caption as description. ID:{asset_id} Caption:{asset_description}")
+        except Exception as e:
+            print(f"Error accessing updateAsset API: {e}")
 
     def upload_asset(self, file):
         """Uploads a single asset, hashing an AssetId for it. Returning the immich id and upload status"""

@@ -11,6 +11,7 @@ class CheckboxFrame(ctk.CTkFrame):
         self.album_input_enabled = ctk.BooleanVar(value=False)
         self.names_as_tags = ctk.BooleanVar(value=False)
         self.tag_input_enabled = ctk.BooleanVar(value=False)
+        self.import_captions = ctk.BooleanVar(value=False)
 
         # Checkboxes
         self.recursive = ctk.CTkCheckBox(self, text="Recursive", variable=self.recursive)
@@ -27,6 +28,8 @@ class CheckboxFrame(ctk.CTkFrame):
         self.tag_input.grid(row=4, column=0, pady=5, padx=5, sticky="w")
         self.tag_input_entry = ctk.CTkEntry(self, placeholder_text="Enter Tag Name")
         self.tag_input_entry.grid(row=4, column=1, pady=5, padx=5, sticky="e")
+        self.import_captions = ctk.CTkCheckBox(self, text="Import captions", variable=self.import_captions)
+        self.import_captions.grid(row=5, column=0, padx=5, pady=5, sticky="w")
 
     def get_states(self):
         """Returns the states of all checkboxes as a dictionary."""
@@ -37,5 +40,6 @@ class CheckboxFrame(ctk.CTkFrame):
             "album_input": self.album_input_entry.get(),
             "directory_names_as_tags": self.names_as_tags.get(),
             "tag_input_enabled": self.tag_input_enabled.get(),
-            "tag_input": self.tag_input_entry.get()
+            "tag_input": self.tag_input_entry.get(),
+            "import_captions": self.import_captions.get()
         }
