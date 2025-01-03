@@ -16,15 +16,27 @@ class GimmichApp(ctk.CTk):
         self.title("gimmich")
 
         self.client = ImmichClient()  # Create the API client.
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
 
         self.main_frame = ctk.CTkFrame(self)  # Main container frame
         self.main_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
+
+        self.main_frame.grid_rowconfigure(0, weight=1)  # Top frame (fixed size)
+        self.main_frame.grid_rowconfigure(1, weight=1)  # Empty space if needed
+        self.main_frame.grid_rowconfigure(2, weight=1)  # Console log (resizable)
+        self.main_frame.grid_columnconfigure(0, weight=1)
 
         self.top_frame = ctk.CTkFrame(self.main_frame)  # Frame for buttons and info
         self.top_frame.grid(row=0, column=0, padx=5, pady=5, sticky="new")
 
         self.console_text = ConsoleFrame(self.main_frame)  # Console log
-        self.console_text.grid(row=2, column=0, padx=5, pady=5, sticky="sew")
+        self.console_text.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
+
+        self.top_frame.grid_columnconfigure(0, weight=1)  # Login frame (fixed size)
+        self.top_frame.grid_columnconfigure(1, weight=1)  # Path frame (resizable)
+        self.top_frame.grid_columnconfigure(2, weight=1)  # Checkbox frame (fixed size)
+        self.top_frame.grid_columnconfigure(3, weight=1)  # Upload frame (fixed size)
 
         self.path_frame = PathFrame(parent=self.top_frame)  # Path frame
         self.path_frame.grid(row=1, column=2, padx=5, pady=5, sticky="ns")
