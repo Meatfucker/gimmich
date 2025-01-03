@@ -23,4 +23,5 @@ Run `python gimmich.py`
 
 ## TODO
 
-Graceful handling of errors. Currently they will always stop the upload process
+Add bulk tagging options for uploads
+Add bulk downloading tab with various criteria to bulk download assets
