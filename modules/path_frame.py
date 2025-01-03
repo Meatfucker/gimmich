@@ -27,10 +27,10 @@ class PathFrame(ctk.CTkFrame):
         self.path_listbox.grid(row=1, column=1, padx=5, pady=5)
 
         self.select_path_button = ctk.CTkButton(self, text="Select Path", command=self.select_path)
-        self.select_path_button.grid(row=2, column=1, pady=5, sticky="ew")
+        self.select_path_button.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
 
         self.remove_path_button = ctk.CTkButton(self, text="Remove Path", command=self.remove_selected_path)
-        self.remove_path_button.grid(row=3, column=1, pady=5, sticky="ew")
+        self.remove_path_button.grid(row=3, column=1, padx=5, pady=5, sticky="ew")
 
     def select_path(self):
         """Open file dialog to select a path"""

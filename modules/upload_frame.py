@@ -14,9 +14,9 @@ class UploadFrame(ctk.CTkFrame):
         self.checkbox_frame = checkbox_frame
         self.login_frame = login_frame
         self.upload_button = ctk.CTkButton(self, text="Upload Images", command=self.upload_images)
-        self.upload_button.grid(row=1, pady=5, sticky="ew")
+        self.upload_button.grid(row=1, padx=5, pady=5, sticky="ew")
         self.stop_button = ctk.CTkButton(self, text="Stop Upload", command=self.stop_upload)
-        self.stop_button.grid(row=2, pady=5, sticky="ew")
+        self.stop_button.grid(row=2, padx=5, pady=5, sticky="ew")
         self._stop_flag = threading.Event()
         self.immich_user = None
         self.immich_url = None
