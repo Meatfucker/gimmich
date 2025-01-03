@@ -33,11 +33,12 @@ class GimmichApp(ctk.CTk):
         self.checkbox_frame.grid(row=1, column=3, padx=5, pady=5, sticky="ns")
         self.checkbox_states = self.checkbox_frame.get_states()
 
-        self.upload_frame = UploadFrame(self.top_frame, self.path_frame, self.checkbox_frame, self.client)  # Upload Frame
-        self.upload_frame.grid(row=1, column=4, padx=5, pady=5, sticky="ns")
-
-        self.login_frame = LoginFrame(self.top_frame, self.upload_frame, self.client)  # Login frame
+        self.login_frame = LoginFrame(self.top_frame, self.client)  # Login frame
         self.login_frame.grid(row=1, column=1, padx=5, pady=5, sticky="nsw")
+
+        self.upload_frame = UploadFrame(self.top_frame, self.path_frame, self.checkbox_frame, self.login_frame,
+                                        self.client)  # Upload Frame
+        self.upload_frame.grid(row=1, column=4, padx=5, pady=5, sticky="ns")
 
     def on_closing(self):
         """Restore sys.stdout before closing"""

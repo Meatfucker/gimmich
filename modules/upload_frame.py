@@ -4,7 +4,7 @@ import os
 
 
 class UploadFrame(ctk.CTkFrame):
-    def __init__(self, parent, path_frame, checkbox_frame, client):
+    def __init__(self, parent, path_frame, checkbox_frame, login_frame, client):
         super().__init__(parent)
         self.configure(width=250, height=300)
         self.pack_propagate(False)
@@ -12,6 +12,7 @@ class UploadFrame(ctk.CTkFrame):
         self.path_frame = path_frame
         self.file_list = []
         self.checkbox_frame = checkbox_frame
+        self.login_frame = login_frame
         self.upload_button = ctk.CTkButton(self, text="Upload Images", command=self.upload_images)
         self.upload_button.grid(row=1, pady=5, sticky="ew")
         self.stop_button = ctk.CTkButton(self, text="Stop Upload", command=self.stop_upload)
@@ -78,6 +79,7 @@ class UploadFrame(ctk.CTkFrame):
             self.progressbar_status.set("Upload stopped")
             self.upload_button.configure(state="normal")  # Re-enable upload button
             self._stop_flag.clear()  # Reset the flag for the next upload
+            self.login_frame.update_login_info()
         print("Upload Completed!")
 
     def gather_file_list(self):

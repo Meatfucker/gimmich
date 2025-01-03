@@ -2,9 +2,8 @@ import customtkinter as ctk
 
 
 class LoginFrame(ctk.CTkFrame):
-    def __init__(self, parent, info_frame, client):
+    def __init__(self, parent, client):
         super().__init__(parent)
-        self.info_frame = info_frame
         self.client = client
         # Login URL Entry
         self.login_url = ctk.CTkEntry(self, placeholder_text="Enter base Immich URL", width=350)
