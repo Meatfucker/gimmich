@@ -3,6 +3,7 @@ import threading
 import os
 import re
 
+
 class UploadFrame(ctk.CTkFrame):
     def __init__(self, parent, path_frame, checkbox_frame, login_frame, client):
         super().__init__(parent)
@@ -75,7 +76,6 @@ class UploadFrame(ctk.CTkFrame):
             if collected_ids:
                 self.process_options(collected_ids, collected_captions)
 
-
         except Exception as e:
             print(f"Unexpected error Uploading: {e}")
 
@@ -96,7 +96,6 @@ class UploadFrame(ctk.CTkFrame):
         self.process_tags_by_dir(collected_ids)
         self.process_captions(collected_captions)
         self.process_captions_as_tags(collected_captions)
-
 
     def gather_file_list(self):
         """Builds the file list based on user options"""
@@ -119,10 +118,12 @@ class UploadFrame(ctk.CTkFrame):
                 else:
                     print(f"No caption file found for: {file}")
 
-    def process_captions_as_tags(self,ids):
+    def process_captions_as_tags(self, ids):
         checkbox_states = self.checkbox_frame.get_states()
         caption_delimiters = checkbox_states['caption_delimiters']
         delimiters_pattern = f"[{re.escape(caption_delimiters)}]"
+        existing_tags = self.client.get_all_tags()
+        all_asset_ids = [value for _, value in ids]
         if checkbox_states['captions_as_tags']:
             for file, asset_id in ids:
                 txt_file = os.path.splitext(file)[0] + '.txt'
@@ -130,9 +131,16 @@ class UploadFrame(ctk.CTkFrame):
                     with open(txt_file, 'r', encoding='utf-8') as f:
                         caption = f.read()
                     tags = [tag.strip() for tag in re.split(delimiters_pattern, caption) if tag.strip()]
-
-                    #self.client.update_asset_description(asset_id, caption)
-
+                    for tag in tags:
+                        if tag not in existing_tags:
+                            tag_id = self.client.create_tag(tag)
+                            self.client.tag_assets(tag_id, [asset_id])
+                            print(f"Created tag {tag}, id:{tag_id}")
+                        else:
+                            tag_id = existing_tags[tag]
+                            self.client.tag_assets(tag_id, [asset_id])
+                            print(
+                                f"Tag {tag} already exists, added to existing tag: {tag_id}")
                     print(f"Added tags from caption for {file}")
                 else:
                     print(f"No caption file found for: {file}")

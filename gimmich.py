@@ -74,7 +74,6 @@ class GimmichApp(ctk.CTk):
         upload_frame = UploadFrame(top_frame, path_frame, checkbox_frame, login_frame, self.client)
         upload_frame.grid(row=0, column=3, padx=2, pady=2, sticky="nsew")
 
-
     def init_download_tab(self, tab):
         """Initialize the Download tab."""
         tab.grid_rowconfigure(0, weight=1)
