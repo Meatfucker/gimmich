@@ -65,8 +65,11 @@ class LoginFrame(ctk.CTkFrame):
         self.client.get_my_user()
         if self.client.logged_in:
             self.login_button.configure(state="disabled")
+            print(f"Logged in as {self.client.user}")
+            print(f"Asset Counts: {self.client.asset_count}")
         else:
             self.login_button.configure(state="normal")
+            print("Not Logged In")
         self.logged_in_status.set(f"Logged in: {self.client.logged_in}")
         self.immich_user_status.set(f"User: {self.client.user}")
         self.immich_url_status.set(f"URL: {self.client.base_url}")

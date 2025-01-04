@@ -60,7 +60,7 @@ class UploadFrame(ctk.CTkFrame):
                 if self._stop_flag.is_set():
                     print("Upload stopped by user.")
                     self.progressbar_status.set("Upload stopped")
-                    break
+                    return
 
                 print(f"Uploading {file} ({index + 1}/{len(self.file_list)})")
                 asset_id, status = self.client.upload_asset(file)
@@ -72,7 +72,7 @@ class UploadFrame(ctk.CTkFrame):
                 progress = (index + 1) / total_files
                 self.upload_progressbar.set(progress)  # Update progress bar
                 self.progressbar_status.set(f"Uploading... {index + 1}/{total_files} files")
-
+            self.progressbar_status.set("Upload Complete")
             if collected_ids:
                 self.process_options(collected_ids, collected_captions)
 
@@ -82,7 +82,6 @@ class UploadFrame(ctk.CTkFrame):
         finally:
             self.upload_progressbar.set(0)  # Reset progress bar
             self.upload_progressbar.stop()
-            self.progressbar_status.set("Upload stopped")
             self.upload_button.configure(state="normal")  # Re-enable upload button
             self._stop_flag.clear()  # Reset the flag for the next upload
             self.login_frame.update_login_info()
