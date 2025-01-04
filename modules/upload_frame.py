@@ -122,8 +122,6 @@ class UploadFrame(ctk.CTkFrame):
         checkbox_states = self.checkbox_frame.get_states()
         caption_delimiters = checkbox_states['caption_delimiters']
         delimiters_pattern = f"[{re.escape(caption_delimiters)}]"
-        existing_tags = self.client.get_all_tags()
-        all_asset_ids = [value for _, value in ids]
         if checkbox_states['captions_as_tags']:
             for file, asset_id in ids:
                 txt_file = os.path.splitext(file)[0] + '.txt'
@@ -132,6 +130,7 @@ class UploadFrame(ctk.CTkFrame):
                         caption = f.read()
                     tags = [tag.strip() for tag in re.split(delimiters_pattern, caption) if tag.strip()]
                     for tag in tags:
+                        existing_tags = self.client.get_all_tags()
                         if tag not in existing_tags:
                             tag_id = self.client.create_tag(tag)
                             self.client.tag_assets(tag_id, [asset_id])
@@ -139,8 +138,7 @@ class UploadFrame(ctk.CTkFrame):
                         else:
                             tag_id = existing_tags[tag]
                             self.client.tag_assets(tag_id, [asset_id])
-                            print(
-                                f"Tag {tag} already exists, added to existing tag: {tag_id}")
+
                     print(f"Added tags from caption for {file}")
                 else:
                     print(f"No caption file found for: {file}")
