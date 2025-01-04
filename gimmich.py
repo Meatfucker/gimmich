@@ -7,50 +7,82 @@ from modules.path_frame import PathFrame
 from modules.checkbox_frame import CheckboxFrame
 from modules.api_client import ImmichClient
 
-# Create the customtkinter app
-
 
 class GimmichApp(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("gimmich")
+        self.geometry("1200x600")  # Set a default size for the window
 
         self.client = ImmichClient()  # Create the API client.
+
+        # Configure row and column weights for resizing
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        self.main_frame = ctk.CTkFrame(self)  # Main container frame
-        self.main_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
+        # Add Tabview
+        self.tab_view = ctk.CTkTabview(self)  # Create a Tabview
+        self.tab_view.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
 
-        self.main_frame.grid_rowconfigure(0, weight=1)  # Top frame (fixed size)
-        self.main_frame.grid_rowconfigure(1, weight=1)  # Empty space if needed
-        self.main_frame.grid_rowconfigure(2, weight=1)  # Console log (resizable)
-        self.main_frame.grid_columnconfigure(0, weight=1)
+        # Create Upload Tab
+        self.upload_tab = self.tab_view.add("Upload")
+        self.init_upload_tab(self.upload_tab)
 
-        self.top_frame = ctk.CTkFrame(self.main_frame)  # Frame for buttons and info
-        self.top_frame.grid(row=0, column=0, padx=5, pady=5, sticky="new")
+        # Create Download Tab
+        self.download_tab = self.tab_view.add("Download")
+        self.init_download_tab(self.download_tab)
 
-        self.console_text = ConsoleFrame(self.main_frame)  # Console log
-        self.console_text.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
+    def init_upload_tab(self, tab):
+        """Initialize the Upload tab with existing UI elements."""
+        tab.grid_rowconfigure(0, weight=1)  # Main frame resizable
+        tab.grid_columnconfigure(0, weight=1)  # Main frame resizable
 
-        self.top_frame.grid_columnconfigure(0, weight=1)  # Login frame (fixed size)
-        self.top_frame.grid_columnconfigure(1, weight=1)  # Path frame (resizable)
-        self.top_frame.grid_columnconfigure(2, weight=1)  # Checkbox frame (fixed size)
-        self.top_frame.grid_columnconfigure(3, weight=1)  # Upload frame (fixed size)
+        # Main Frame
+        main_frame = ctk.CTkFrame(tab)
+        main_frame.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
+        main_frame.grid_rowconfigure(0, weight=1)  # Top frame resizable
+        main_frame.grid_rowconfigure(1, weight=100)  # Console frame resizable
+        main_frame.grid_columnconfigure(0, weight=1)
 
-        self.path_frame = PathFrame(parent=self.top_frame)  # Path frame
-        self.path_frame.grid(row=1, column=2, padx=5, pady=5, sticky="ns")
+        # Top Frame
+        top_frame = ctk.CTkFrame(main_frame)
+        top_frame.grid(row=0, column=0, padx=2, pady=2, sticky="new")
+        top_frame.grid_columnconfigure(0, weight=1)  # Login frame fixed size
+        top_frame.grid_columnconfigure(1, weight=1)  # Path frame resizable
+        top_frame.grid_columnconfigure(2, weight=1)  # Checkbox frame fixed size
+        top_frame.grid_columnconfigure(3, weight=1)  # Upload frame fixed size
 
-        self.checkbox_frame = CheckboxFrame(self.top_frame)  # Checkbox frame
-        self.checkbox_frame.grid(row=1, column=3, padx=5, pady=5, sticky="ns")
-        self.checkbox_states = self.checkbox_frame.get_states()
+        # Console Frame
+        console_text = ConsoleFrame(main_frame)
+        console_text.grid(row=1, column=0, padx=2, pady=2, sticky="nsew")
+        console_text.grid_rowconfigure(1, weight=1)
+        console_text.grid_columnconfigure(0, weight=1)
 
-        self.login_frame = LoginFrame(self.top_frame, self.client)  # Login frame
-        self.login_frame.grid(row=1, column=1, padx=5, pady=5, sticky="nsw")
+        # Login Frame
+        login_frame = LoginFrame(top_frame, self.client)
+        login_frame.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
 
-        self.upload_frame = UploadFrame(self.top_frame, self.path_frame, self.checkbox_frame, self.login_frame,
-                                        self.client)  # Upload Frame
-        self.upload_frame.grid(row=1, column=4, padx=5, pady=5, sticky="ns")
+        # Path Frame
+        path_frame = PathFrame(parent=top_frame)
+        path_frame.grid(row=0, column=1, padx=2, pady=2, sticky="nsew")
+
+        # Checkbox Frame
+        checkbox_frame = CheckboxFrame(top_frame)
+        checkbox_frame.grid(row=0, column=2, padx=2, pady=2, sticky="nsew")
+
+        # Upload Frame
+        upload_frame = UploadFrame(top_frame, path_frame, checkbox_frame, login_frame, self.client)
+        upload_frame.grid(row=0, column=3, padx=2, pady=2, sticky="nsew")
+
+
+    def init_download_tab(self, tab):
+        """Initialize the Download tab."""
+        tab.grid_rowconfigure(0, weight=1)
+        tab.grid_columnconfigure(0, weight=1)
+
+        # Empty frame for now
+        empty_frame = ctk.CTkFrame(tab)
+        empty_frame.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
 
     def on_closing(self):
         """Restore sys.stdout before closing"""

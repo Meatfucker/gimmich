@@ -5,6 +5,7 @@ import hashlib
 import os
 import json
 import time
+import random
 from datetime import datetime
 import keyring
 
@@ -177,7 +178,7 @@ class ImmichClient:
         """Creates a tag, returning the tag id"""
         url = f"{self.base_url}/api/tags"
         payload = json.dumps({
-            'name': tag_name,
+            'name': tag_name
         })
         headers = {
             'Content-Type': 'application/json',
@@ -188,12 +189,34 @@ class ImmichClient:
             response = requests.request("POST", url, headers=headers, data=payload)
             if response.status_code == 201:
                 response_data = response.json()
-                album_id = response_data.get('id')  # Extract the 'id' field
-                return album_id
+                tag_id = response_data.get('id')  # Extract the 'id' field
+                self.random_tag_color(tag_id)
+                return tag_id
             else:
                 print(f"Error creating tag {tag_name}")
         except Exception as e:
             print(f"Error accessing createTag API: {e}")
+
+    def random_tag_color(self, tag_id):
+        """Assigns the supplied tag a random color"""
+        url = f"{self.base_url}/api/tags/{tag_id}"
+        tag_color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
+        payload = json.dumps({
+            'color': tag_color
+        })
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'x-api-key': self.token
+        }
+        try:
+            response = requests.request("PUT", url, headers=headers, data=payload)
+            if response.status_code == 200:
+                return
+            else:
+                print(f"Error assigning color:{tag_color} to tag {tag_id}")
+        except Exception as e:
+            print(f"Error accessing updateTag API: {e}")
 
     def tag_assets(self, tag_id, asset_ids):
         """Takes a tag id and a list of asset ids then adds them to the tag"""
@@ -254,7 +277,7 @@ class ImmichClient:
         while attempt < 3:
             try:
                 response = requests.request("POST", url, headers=headers, files=files)
-                if response.status_code == 201:
+                if response.status_code in [200, 201]:
 
                     response_data = response.json()
                     asset_id = response_data.get('id')

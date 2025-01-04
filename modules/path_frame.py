@@ -17,20 +17,25 @@ class PathFrame(ctk.CTkFrame):
         self.filtered_file_list = []
         self.file_list = []
         self.path_list = []
+        # Layout grid configuration
+        for col in range(1):
+            self.columnconfigure(col, weight=1)  # Even column widths
+        for row in range(6):
+            self.rowconfigure(row, weight=0)  # Uniform row heights, no extra stretching
         self.path_listbox_label = ctk.CTkLabel(self, text="Selected Paths:")
-        self.path_listbox_label.grid(row=0, column=1, padx=5, pady=5)
+        self.path_listbox_label.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
         # Using tkinter Listbox here and theming it to match
         custom_font = ctk.CTkFont(family="Roboto", size=20)
         self.path_listbox = tk.Listbox(self, height=10, width=40, fg="#9E9E9E", bg="#343638", selectbackground="gray",
                                        selectforeground="white", font=custom_font, borderwidth=0, highlightthickness=0)
 
-        self.path_listbox.grid(row=1, column=1, padx=5, pady=5)
+        self.path_listbox.grid(row=1, column=0, padx=5, pady=5, sticky="ew")
 
         self.select_path_button = ctk.CTkButton(self, text="Select Path", command=self.select_path)
-        self.select_path_button.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
+        self.select_path_button.grid(row=2, column=0, padx=5, pady=5, sticky="ew")
 
         self.remove_path_button = ctk.CTkButton(self, text="Remove Path", command=self.remove_selected_path)
-        self.remove_path_button.grid(row=3, column=1, padx=5, pady=5, sticky="ew")
+        self.remove_path_button.grid(row=3, column=0, padx=5, pady=5, sticky="ew")
 
     def select_path(self):
         """Open file dialog to select a path"""

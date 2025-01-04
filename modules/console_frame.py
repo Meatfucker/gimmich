@@ -6,9 +6,10 @@ from datetime import datetime
 class ConsoleFrame(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
-        self.main_frame = ctk.CTkTextbox(self, wrap="word", height=200)  # Console log
+        self.main_frame = ctk.CTkTextbox(self, wrap="word")  # Console log
         self.main_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nsew", columnspan=2)
-        self.grid_rowconfigure((0, 1), weight=1)  # Ensure it expands properly
+        self.grid_rowconfigure(0, weight=100)  # Ensure it expands properly
+        self.grid_rowconfigure(2, weight=1)  # Ensure it expands properly
         self.grid_columnconfigure(0, weight=1)
         self.save_button = ctk.CTkButton(self, text="Save Log", command=self.save_log)
         self.save_button.grid(row=1, column=0, padx=5, pady=5, sticky="w")
