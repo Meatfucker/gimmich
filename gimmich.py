@@ -6,6 +6,8 @@ from modules.upload_frame import UploadFrame
 from modules.path_frame import PathFrame
 from modules.checkbox_frame import CheckboxFrame
 from modules.api_client import ImmichClient
+from modules.download_frame import DownloadFrame
+from modules.add_asset_frame import AddAssetFrame
 
 
 class GimmichApp(ctk.CTk):
@@ -58,35 +60,35 @@ class GimmichApp(ctk.CTk):
         """Initialize the Upload tab."""
         tab.grid_rowconfigure(0, weight=1)  # Main frame resizable
         tab.grid_columnconfigure(0, weight=1)  # Main frame resizable
-
-        # Top Frame
-        top_frame = ctk.CTkFrame(tab)
-        top_frame.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
-        top_frame.grid_columnconfigure(0, weight=1)  # Login frame fixed size
-        top_frame.grid_columnconfigure(1, weight=1)  # Path frame resizable
-        top_frame.grid_columnconfigure(2, weight=1)  # Checkbox frame fixed size
-        top_frame.grid_rowconfigure(0, weight=1)
+        tab.grid_columnconfigure(1, weight=1)  # Path frame resizable
+        tab.grid_columnconfigure(2, weight=1)  # Checkbox frame fixed size
 
         # Path Frame
-        path_frame = PathFrame(parent=top_frame)
-        path_frame.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
+        path_frame = PathFrame(parent=tab)
+        path_frame.grid(row=0, column=0, padx=10, pady=2, sticky="nsew")
 
         # Checkbox Frame
-        checkbox_frame = CheckboxFrame(top_frame)
-        checkbox_frame.grid(row=0, column=1, padx=2, pady=2, sticky="nsew")
+        checkbox_frame = CheckboxFrame(tab)
+        checkbox_frame.grid(row=0, column=1, padx=10, pady=2, sticky="nsew")
 
         # Upload Frame
-        upload_frame = UploadFrame(top_frame, path_frame, checkbox_frame, self.login_frame, self.client)
-        upload_frame.grid(row=0, column=2, padx=2, pady=2, sticky="nsew")
+        upload_frame = UploadFrame(tab, path_frame, checkbox_frame, self.login_frame, self.client)
+        upload_frame.grid(row=0, column=2, padx=10, pady=2, sticky="nsew")
 
     def init_download_tab(self, tab):
         """Initialize the Download tab."""
+        tab.columnconfigure(0, weight=1)
+        tab.columnconfigure(1, weight=1)
+        tab.rowconfigure(0, weight=1)
         tab.grid_rowconfigure(0, weight=1)
         tab.grid_columnconfigure(0, weight=1)
+        tab.grid_columnconfigure(1, weight=1)
 
-        # Empty frame for now
-        empty_frame = ctk.CTkFrame(tab)
-        empty_frame.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
+        download_frame = DownloadFrame(tab, self.login_frame, self.client)
+        download_frame.grid(row=0, column=1, padx=2, pady=2, sticky="nsew")
+
+        add_asset_frame = AddAssetFrame(tab, self.client, download_frame)
+        add_asset_frame.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
 
     def on_closing(self):
         """Restore sys.stdout before closing"""

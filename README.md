@@ -1,8 +1,8 @@
-![gimmich](/gimmich-screenshot.png)
+![gimmich](/gimmich.gif)
 
 # gimmich
 
-gimmich is a GUI frontend for immich to make bulk uploading to your image server easy.
+gimmich is a GUI for immich to make bulk uploading/downloading using your image server easy.
 
 - Immich API based
 - Supports multiple paths at once
@@ -12,6 +12,7 @@ gimmich is a GUI frontend for immich to make bulk uploading to your image server
 useful for importing machine learning datasets.
 - Import tags from text files using delimiters
 - Import tags based on directory name or user input
+- Preliminary bulk download based on albums and tags
 
 
 ## Requirements
@@ -19,6 +20,7 @@ useful for importing machine learning datasets.
 - Python 3.12
 - customtkinter `pip install customtkinter`
 - keyring `pip install keyring`
+- pillow `pip install pillow`
 
 ## Installation
 
@@ -27,4 +29,4 @@ useful for importing machine learning datasets.
 
 ## TODO
 
-- Add bulk downloading tab with various criteria to bulk download assets
+- Add bulk downloading for smart search and people search

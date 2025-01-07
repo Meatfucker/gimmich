@@ -33,9 +33,6 @@ class UploadFrame(ctk.CTkFrame):
         self.upload_progressbar.grid(row=5, padx=5, pady=5, sticky="ew")
         self.upload_progressbar.set(0)
 
-    def get_albums(self):
-        albums = self.client.get_all_albums()
-        print(albums)
 
     def upload_images(self):
         """Upload each file in a non-blocking manner, presenting a progressbar"""
@@ -160,7 +157,6 @@ class UploadFrame(ctk.CTkFrame):
     def process_albums_by_dir(self, ids):
         checkbox_states = self.checkbox_frame.get_states()
         existing_albums = self.client.get_all_albums()
-        all_asset_ids = [value for _, value in ids]
         if checkbox_states['directory_names_as_albums']:
             albums_by_directory = {}
             for directory_name, asset_id in ids:
@@ -169,11 +165,11 @@ class UploadFrame(ctk.CTkFrame):
                 #  Check if the album exists and if not, create an album for each directory
                 if directory_name not in existing_albums:
                     album_id = self.client.create_album(directory_name)
-                    self.client.add_assets_to_album(album_id, all_asset_ids)
+                    self.client.add_assets_to_album(album_id, asset_ids)
                     print(f"Created album {directory_name}, id:{album_id}")
                 else:
                     album_id = existing_albums[directory_name]
-                    self.client.add_assets_to_album(album_id, all_asset_ids)
+                    self.client.add_assets_to_album(album_id, asset_ids)
                     print(f"Album {directory_name} already exists, added assets to existing album: {album_id}")
 
     def process_tags(self, ids):
@@ -194,7 +190,6 @@ class UploadFrame(ctk.CTkFrame):
     def process_tags_by_dir(self, ids):
         checkbox_states = self.checkbox_frame.get_states()
         existing_tags = self.client.get_all_tags()
-        all_asset_ids = [value for _, value in ids]
         if checkbox_states['directory_names_as_tags']:
             tags_by_directory = {}
             for directory_name, asset_id in ids:
@@ -204,11 +199,11 @@ class UploadFrame(ctk.CTkFrame):
                 #  Check if the tag exists and if not, create a tag for each directory
                 if directory_name not in existing_tags:
                     tag_id = self.client.create_tag(directory_name)
-                    self.client.tag_assets(tag_id, all_asset_ids)
+                    self.client.tag_assets(tag_id, asset_ids)
                     print(f"Created tag {directory_name}, id:{tag_id}")
                 else:
                     tag_id = existing_tags[directory_name]
-                    self.client.tag_assets(tag_id, all_asset_ids)
+                    self.client.tag_assets(tag_id, asset_ids)
                     print(f"Tag {directory_name} already exists, added assets to existing tag: {tag_id}")
 
     def stop_upload(self):
