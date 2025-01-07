@@ -15,11 +15,11 @@ class AddDownloadPackFrame(ctk.CTkFrame):
         self.thumb = thumb
         self.asset_ids = asset_ids
         self.thumbnail_label = ctk.CTkLabel(self, image=self.thumb, text="")
-        self.thumbnail_label.grid(row=0, column=0, padx=1, pady=1)
+        self.thumbnail_label.grid(row=0, column=0, padx=2, pady=0)
         self.name_label = ctk.CTkLabel(self, text=self.name)
-        self.name_label.grid(row=0, column=1, padx=1, pady=1, sticky="ew")
-        self.add_pack_button = ctk.CTkButton(self, text="Add to download", command=self.add_album_pack)
-        self.add_pack_button.grid(row=0, column=2, padx=1, pady=1, sticky="ew")
+        self.name_label.grid(row=0, column=1, padx=2, pady=0, sticky="ew")
+        self.add_pack_button = ctk.CTkButton(self, text="Add to download", command=self.add_album_pack, corner_radius=0)
+        self.add_pack_button.grid(row=0, column=2, padx=2, pady=0, sticky="ew")
 
     def add_album_pack(self):
         self.download_frame.add_album_pack(self.name, self.thumb, self.asset_ids)

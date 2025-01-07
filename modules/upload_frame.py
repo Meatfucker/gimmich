@@ -8,11 +8,9 @@ class UploadFrame(ctk.CTkFrame):
     def __init__(self, parent, path_frame, checkbox_frame, login_frame, client):
         super().__init__(parent)
         self.configure(width=250, height=300)
-        self.pack_propagate(False)
-        # Layout grid configuration
         for col in range(1):
             self.columnconfigure(col, weight=1)  # Even column widths
-        for row in range(6):
+        for row in range(4):
             self.rowconfigure(row, weight=0)  # Uniform row heights, no extra stretching
         self.client = client
         self.path_frame = path_frame

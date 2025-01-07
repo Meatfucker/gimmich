@@ -59,13 +59,14 @@ class GimmichApp(ctk.CTk):
     def init_upload_tab(self, tab):
         """Initialize the Upload tab."""
         tab.grid_rowconfigure(0, weight=1)  # Main frame resizable
+        tab.grid_rowconfigure(1, weight=1)  # Main frame resizable
         tab.grid_columnconfigure(0, weight=1)  # Main frame resizable
         tab.grid_columnconfigure(1, weight=1)  # Path frame resizable
-        tab.grid_columnconfigure(2, weight=1)  # Checkbox frame fixed size
+
 
         # Path Frame
         path_frame = PathFrame(parent=tab)
-        path_frame.grid(row=0, column=0, padx=10, pady=2, sticky="nsew")
+        path_frame.grid(row=0, column=0, padx=10, pady=2, sticky="nsew", rowspan=2)
 
         # Checkbox Frame
         checkbox_frame = CheckboxFrame(tab)
@@ -73,7 +74,7 @@ class GimmichApp(ctk.CTk):
 
         # Upload Frame
         upload_frame = UploadFrame(tab, path_frame, checkbox_frame, self.login_frame, self.client)
-        upload_frame.grid(row=0, column=2, padx=10, pady=2, sticky="nsew")
+        upload_frame.grid(row=1, column=1, padx=10, pady=2, sticky="sew")
 
     def init_download_tab(self, tab):
         """Initialize the Download tab."""
