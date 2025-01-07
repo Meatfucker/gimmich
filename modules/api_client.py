@@ -175,6 +175,26 @@ class ImmichClient:
         except Exception as e:
             print(f"Error accessing getAllAlbums API: {e}")
 
+    def get_all_people(self):
+        """Returns a list of all people ids"""
+        url = f"{self.base_url}/api/people"
+        payload = {}
+        headers = {
+            'Accept': 'application/json',
+            'x-api-key': self.token
+        }
+        try:
+            response = requests.request("GET", url, headers=headers, data=payload)
+            if response.status_code == 200:
+                data = response.json()
+                people = data.get('people', [])
+                ids = [person['id'] for person in people if 'id' in person]
+                return ids
+            else:
+                print("Error getting people list")
+        except Exception as e:
+            print(f"Error accessing getAllPeople API: {e}")
+
     def get_all_tags(self):
         """Returns a list of all tag names and associated ids"""
         url = f"{self.base_url}/api/tags"
@@ -256,7 +276,30 @@ class ImmichClient:
             self.logged_in = False
             print(f"Error accessing getMyUser API. {e}")
 
-    def get_tag_timebuckets(self, tag_id):
+    def get_person(self, person_id):
+        """Takes a person id and returns a list of assetIds"""
+        url = f"{self.base_url}/api/search/metadata"
+        payload = json.dumps({
+            'personIds': [person_id]
+        })
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'x-api-key': self.token
+        }
+        try:
+            response = requests.request("POST", url, headers=headers, data=payload)
+            if response.status_code == 200:
+                response_data = response.json()
+                assets = response_data.get('assets', {})
+                items = assets.get('items', [])
+                asset_ids = [item['id'] for item in items if 'id' in item]
+                return asset_ids
+        except Exception as e:
+            print(f"Error accessing searchAssets API: {e}")
+
+
+    def get_tag_time_buckets(self, tag_id):
         """Returns a list of the timeBuckets with the tag."""
         url = f"{self.base_url}/api/timeline/buckets?size=MONTH&tagId={tag_id}&withStacked=false"
         payload = {}
@@ -283,7 +326,7 @@ class ImmichClient:
         except Exception as e:
             print(f"Error accessing getTimeBuckets API: {e}")
 
-    def get_timebucket_assets_by_tag(self, time_bucket, tag_id):
+    def get_time_bucket_assets_by_tag(self, time_bucket, tag_id):
         """Takes a timeBucket string and tag, then returns the objects within"""
         url = f"{self.base_url}/api/timeline/bucket?size=MONTH&tagId={tag_id}&timeBucket={time_bucket}"
         payload = {}
@@ -402,7 +445,6 @@ class ImmichClient:
         """Returns a file-like object of an assets thumbnail."""
         url = f"{self.base_url}/api/assets/{asset_id}/thumbnail"
         payload = {}
-        payload = {}
         headers = {
             'Accept': 'application/octet-stream',
             'x-api-key': self.token
@@ -415,5 +457,4 @@ class ImmichClient:
             else:
                 print(f"Error getting thumb for {asset_id}")
         except Exception as e:
-            print(f'Error accessing viewAsset API')
-
+            print(f'Error accessing viewAsset API: {e}')

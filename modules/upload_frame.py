@@ -33,7 +33,6 @@ class UploadFrame(ctk.CTkFrame):
         self.upload_progressbar.grid(row=5, padx=5, pady=5, sticky="ew")
         self.upload_progressbar.set(0)
 
-
     def upload_images(self):
         """Upload each file in a non-blocking manner, presenting a progressbar"""
         self.upload_progressbar.set(0)  # Reset progress bar before starting

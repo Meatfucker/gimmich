@@ -15,11 +15,11 @@ class AddDownloadPackFrame(ctk.CTkFrame):
         self.thumb = thumb
         self.asset_ids = asset_ids
         self.thumbnail_label = ctk.CTkLabel(self, image=self.thumb, text="")
-        self.thumbnail_label.grid(row=0, column=0, padx=5, pady=1)
+        self.thumbnail_label.grid(row=0, column=0, padx=1, pady=1)
         self.name_label = ctk.CTkLabel(self, text=self.name)
-        self.name_label.grid(row=0, column=1, padx=5, pady=1, sticky="ew")
+        self.name_label.grid(row=0, column=1, padx=1, pady=1, sticky="ew")
         self.add_pack_button = ctk.CTkButton(self, text="Add to download", command=self.add_album_pack)
-        self.add_pack_button.grid(row=0, column=2, padx=5, pady=1, sticky="ew")
+        self.add_pack_button.grid(row=0, column=2, padx=1, pady=1, sticky="ew")
 
     def add_album_pack(self):
         self.download_frame.add_album_pack(self.name, self.thumb, self.asset_ids)
@@ -35,13 +35,13 @@ class AddAssetFrame(ctk.CTkFrame):
         # Configure layout
         for col in range(1):
             self.columnconfigure(col, weight=1)
-        self.rowconfigure(1, weight=1)  # Make the scrollable frame fill the top space
-        self.rowconfigure(1, weight=1)  # Allow space for the button
+        self.rowconfigure(1, weight=1)
+        self.rowconfigure(3, weight=1)
+        self.rowconfigure(5, weight=1)
 
         # Add a scrollable frame
         self.album_list_label = ctk.CTkLabel(self, text="Album List")
         self.album_list_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
-
         self.scrollable_album_frame = ctk.CTkScrollableFrame(self)
         self.scrollable_album_frame.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
         self.scrollable_album_frame.columnconfigure(0, weight=1)
@@ -51,37 +51,53 @@ class AddAssetFrame(ctk.CTkFrame):
         self.scrollable_tag_frame = ctk.CTkScrollableFrame(self)
         self.scrollable_tag_frame.grid(row=3, column=0, padx=5, pady=5, sticky="nsew")
         self.scrollable_tag_frame.columnconfigure(0, weight=1)
+
+        self.people_list_label = ctk.CTkLabel(self, text="People List")
+        self.people_list_label.grid(row=4, column=0, padx=5, pady=5, sticky="w")
+        self.scrollable_people_frame = ctk.CTkScrollableFrame(self)
+        self.scrollable_people_frame.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
+        self.scrollable_people_frame.columnconfigure(0, weight=1)
         self.refresh_albums_tags_button = ctk.CTkButton(self, text="Refresh Albums and Tags",
-                                                        command=self.refresh_albums_tags)
-        self.refresh_albums_tags_button.grid(row=4, column=0, padx=5, pady=5, sticky="e")
+                                                        command=self.refresh_packs)
+        self.refresh_albums_tags_button.grid(row=6, column=0, padx=5, pady=5, sticky="e")
 
         if self.client.logged_in:
-            self.refresh_albums_tags()
+            self.refresh_packs()
 
-
-    def refresh_albums_tags(self):
+    def refresh_packs(self):
         if self.client.logged_in:
             threading.Thread(target=self.get_album_info, daemon=True).start()
             threading.Thread(target=self.get_tag_info, daemon=True).start()
+            threading.Thread(target=self.get_people_info, daemon=True).start()
 
+    def get_people_info(self):
+        people_ids = self.client.get_all_people()
+        row = 0
+        for people_id in people_ids:
+            asset_ids = self.client.get_person(people_id)
+            thumb_data = self.client.view_asset(asset_ids[0])
+            thumb = ctk.CTkImage(light_image=Image.open(thumb_data), size=(32, 32))
+            people_pack = AddDownloadPackFrame(self.scrollable_people_frame, self.download_frame,
+                                               f"{people_id}-person", thumb, asset_ids)
+            people_pack.grid(row=row, column=0, padx=5, pady=1, sticky="ew")
+            row += 1
 
     def get_tag_info(self):
         tag_ids = self.client.get_all_tags()
         row = 0
         for tag_name, tag_id in tag_ids.items():
-            tag_timebuckets = self.client.get_tag_timebuckets(tag_id)
-            if tag_timebuckets:
+            tag_time_buckets = self.client.get_tag_time_buckets(tag_id)
+            if tag_time_buckets:
                 asset_ids = []
-                for time_bucket in tag_timebuckets:
-                    ids = self.client.get_timebucket_assets_by_tag(time_bucket, tag_id)
+                for time_bucket in tag_time_buckets:
+                    ids = self.client.get_time_bucket_assets_by_tag(time_bucket, tag_id)
                     asset_ids = asset_ids + ids
                 thumb_data = self.client.view_asset(asset_ids[0])
-                thumb = ctk.CTkImage(light_image=Image.open(thumb_data), size=(50, 50))
+                thumb = ctk.CTkImage(light_image=Image.open(thumb_data), size=(32, 32))
                 tag_pack = AddDownloadPackFrame(self.scrollable_tag_frame, self.download_frame, f"{tag_name}-tag",
                                                 thumb, asset_ids)
                 tag_pack.grid(row=row, column=0, padx=5, pady=1, sticky="ew")
                 row += 1
-
 
     def get_album_info(self):
         album_ids = self.client.get_all_albums()
@@ -89,11 +105,8 @@ class AddAssetFrame(ctk.CTkFrame):
         for album_name, album_id in album_ids.items():
             asset_ids, thumb_id = self.client.get_album_info(album_id)
             thumb_data = self.client.view_asset(thumb_id)
-            thumb = ctk.CTkImage(light_image=Image.open(thumb_data), size=(50, 50))
+            thumb = ctk.CTkImage(light_image=Image.open(thumb_data), size=(32, 32))
             album_pack = AddDownloadPackFrame(self.scrollable_album_frame, self.download_frame,
                                               f"{album_name}-album", thumb, asset_ids)
             album_pack.grid(row=row, column=0, padx=5, pady=1, sticky="ew")
             row += 1
-
-
-

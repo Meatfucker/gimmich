@@ -30,6 +30,7 @@ class DownloadFrame(ctk.CTkFrame):
     def __init__(self, parent, login_frame, client):
         super().__init__(parent)
         self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
         self.client = client
         self.login_frame = login_frame
         self.queued_downloads = []  # List to hold DownloadPackFrame objects
@@ -68,6 +69,8 @@ class DownloadFrame(ctk.CTkFrame):
 
     def download_images(self):
         """Download each pack in a non-blocking manner, presenting a progressbar"""
+        if self.save_path == "No Path Selected":
+            return
         self.download_progressbar.set(0)  # Reset progress bar before starting
         self.progressbar_status.set("Preparing to download...")
         self.download_button.configure(state="disabled")  # Disable upload button
@@ -87,7 +90,7 @@ class DownloadFrame(ctk.CTkFrame):
                     self.progressbar_status.set("Download Stopped")
                     return
                 archive = self.client.download_archive(child.asset_ids)
-                with open(f"{child.name}.zip", "wb") as file:
+                with open(f"{self.save_path}/{child.name}.zip", "wb") as file:
                     file.write(archive.getvalue())
                 progress = (index + 1) / total_files
                 self.download_progressbar.set(progress)  # Update progress bar
