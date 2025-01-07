@@ -77,7 +77,8 @@ class AddAssetFrame(ctk.CTkFrame):
                     asset_ids = asset_ids + ids
                 thumb_data = self.client.view_asset(asset_ids[0])
                 thumb = ctk.CTkImage(light_image=Image.open(thumb_data), size=(50, 50))
-                tag_pack = AddDownloadPackFrame(self.scrollable_tag_frame, self.download_frame, tag_name, thumb, asset_ids)
+                tag_pack = AddDownloadPackFrame(self.scrollable_tag_frame, self.download_frame, f"{tag_name}-tag",
+                                                thumb, asset_ids)
                 tag_pack.grid(row=row, column=0, padx=5, pady=1, sticky="ew")
                 row += 1
 
@@ -89,8 +90,8 @@ class AddAssetFrame(ctk.CTkFrame):
             asset_ids, thumb_id = self.client.get_album_info(album_id)
             thumb_data = self.client.view_asset(thumb_id)
             thumb = ctk.CTkImage(light_image=Image.open(thumb_data), size=(50, 50))
-            album_pack = AddDownloadPackFrame(self.scrollable_album_frame, self.download_frame, album_name, thumb,
-                                              asset_ids)
+            album_pack = AddDownloadPackFrame(self.scrollable_album_frame, self.download_frame,
+                                              f"{album_name}-album", thumb, asset_ids)
             album_pack.grid(row=row, column=0, padx=5, pady=1, sticky="ew")
             row += 1
 

@@ -3,7 +3,7 @@ import threading
 from tkinter import filedialog
 
 
-class AddAlbumPackDownloadFrame(ctk.CTkFrame):
+class AddPackDownloadFrame(ctk.CTkFrame):
     def __init__(self, parent, album_name, thumb, asset_ids):
         super().__init__(parent, border_width=2, border_color="gray")
         for row in range(1):
@@ -15,7 +15,7 @@ class AddAlbumPackDownloadFrame(ctk.CTkFrame):
         self.asset_ids = asset_ids
         self.thumbnail_label = ctk.CTkLabel(self, image=self.thumb, text="")
         self.thumbnail_label.grid(row=0, column=0, padx=5, pady=1)
-        self.name_label = ctk.CTkLabel(self, text=f"Album: {self.name}")
+        self.name_label = ctk.CTkLabel(self, text=self.name)
         self.name_label.grid(row=0, column=1, padx=5, pady=1, sticky="ew")
         self.remove_pack_button = ctk.CTkButton(self, text="Remove", command=self.remove_album_pack)
         self.remove_pack_button.grid(row=0, column=2, padx=5, pady=1, sticky="ew")
@@ -63,7 +63,7 @@ class DownloadFrame(ctk.CTkFrame):
 
     def add_album_pack(self, name, thumb, asset_ids):
         next_row = len(self.scrollable_frame.winfo_children())
-        album_pack = AddAlbumPackDownloadFrame(self.scrollable_frame, name, thumb, asset_ids)
+        album_pack = AddPackDownloadFrame(self.scrollable_frame, name, thumb, asset_ids)
         album_pack.grid(row=next_row, column=0, padx=5, pady=1, sticky="ew")
 
     def download_images(self):
@@ -77,10 +77,22 @@ class DownloadFrame(ctk.CTkFrame):
     def download_task(self):
         try:
             # Iterate over all child widgets in the scrollable frame
-            for child in self.scrollable_frame.winfo_children():
+            total_files = len(self.scrollable_frame.winfo_children())
+            if total_files == 0:
+                self.progressbar_status.set("No files to download")
+                return
+            for index, child in enumerate(self.scrollable_frame.winfo_children()):
+                if self._stop_flag.is_set():
+                    print("Download stopped by user.")
+                    self.progressbar_status.set("Download Stopped")
+                    return
                 archive = self.client.download_archive(child.asset_ids)
                 with open(f"{child.name}.zip", "wb") as file:
                     file.write(archive.getvalue())
+                progress = (index + 1) / total_files
+                self.download_progressbar.set(progress)  # Update progress bar
+                self.progressbar_status.set(f"Downloading... {index + 1}/{total_files} files")
+            self.progressbar_status.set("Download Complete")
 
         except Exception as e:
             print(f"Unexpected error Downloading: {e}")
@@ -88,7 +100,6 @@ class DownloadFrame(ctk.CTkFrame):
         finally:
             self.download_progressbar.set(0)  # Reset progress bar
             self.download_progressbar.stop()
-            self.progressbar_status.set("Download Complete")
             self.download_button.configure(state="normal")  # Re-enable upload button
             self._stop_flag.clear()  # Reset the flag for the next upload
             self.login_frame.update_login_info()
