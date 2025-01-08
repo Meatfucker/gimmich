@@ -32,7 +32,6 @@ useful for importing machine learning datasets.
 
 - Add bulk downloading for smart search 
 - Make upload tab look nicer and unified with the look of the download tab instead of a crusty ol listbox
-- Add per pack upload options similar to download ones.
 - Make proper installer
 - Make standalone exe
 

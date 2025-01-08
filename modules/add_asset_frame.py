@@ -4,13 +4,14 @@ from PIL import Image, ImageDraw
 
 
 class AddDownloadPackFrame(ctk.CTkFrame):
-    def __init__(self, parent, download_frame, name, thumb, asset_ids):
-        super().__init__(parent, border_width=2, border_color="gray")
+    def __init__(self, parent, download_frame, name, thumb, asset_ids, color):
+        super().__init__(parent, border_width=2, border_color="gray", fg_color=color)
         for row in range(1):
             self.rowconfigure(row, weight=1)
         self.columnconfigure(1, weight=1)
         self.parent = parent
         self.download_frame = download_frame
+        self.color = color
         self.name = name
         self.thumb = thumb
         self.asset_ids = asset_ids
@@ -18,11 +19,11 @@ class AddDownloadPackFrame(ctk.CTkFrame):
         self.thumbnail_label.grid(row=0, column=0, padx=2, pady=0)
         self.name_label = ctk.CTkLabel(self, text=self.name)
         self.name_label.grid(row=0, column=1, padx=2, pady=0, sticky="ew")
-        self.add_pack_button = ctk.CTkButton(self, text="Add to download", command=self.add_album_pack, corner_radius=0)
+        self.add_pack_button = ctk.CTkButton(self, text="Add to download", command=self.add_asset_pack, corner_radius=0)
         self.add_pack_button.grid(row=0, column=2, padx=2, pady=0, sticky="ew")
 
-    def add_album_pack(self):
-        self.download_frame.add_album_pack(self.name, self.thumb, self.asset_ids)
+    def add_asset_pack(self):
+        self.download_frame.add_pack(self.name, self.thumb, self.asset_ids, self.color)
 
 
 class AddAssetFrame(ctk.CTkFrame):
@@ -52,12 +53,25 @@ class AddAssetFrame(ctk.CTkFrame):
         self.scrollable_people_frame = ctk.CTkScrollableFrame(self, label_text="People List")
         self.scrollable_people_frame.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
         self.scrollable_people_frame.columnconfigure(0, weight=1)
+        self.add_all_assets_button = ctk.CTkButton(self, text="Add All Assets",
+                                                        command=self.add_all_assets)
+        self.add_all_assets_button.grid(row=6, column=0, padx=5, pady=5, sticky="w")
         self.refresh_albums_tags_button = ctk.CTkButton(self, text="Refresh Albums and Tags",
                                                         command=self.refresh_packs)
         self.refresh_albums_tags_button.grid(row=6, column=0, padx=5, pady=5, sticky="e")
 
         if self.client.logged_in:
             self.refresh_packs()
+
+    def add_all_assets(self):
+        if self.client.logged_in:
+            asset_ids = self.client.get_all_assets()
+            print(asset_ids)
+            thumb_data = self.client.view_asset(asset_ids[0])
+            thumb = ctk.CTkImage(light_image=Image.open(thumb_data), size=(32, 32))
+            people_pack = AddDownloadPackFrame(self.scrollable_people_frame, self.download_frame,
+                                               "ALL ASSETS", thumb, asset_ids, "#212121")
+            people_pack.add_asset_pack()
 
     def refresh_packs(self):
         if self.client.logged_in:
@@ -73,7 +87,7 @@ class AddAssetFrame(ctk.CTkFrame):
             thumb_data = self.client.view_asset(asset_ids[0])
             thumb = ctk.CTkImage(light_image=Image.open(thumb_data), size=(32, 32))
             people_pack = AddDownloadPackFrame(self.scrollable_people_frame, self.download_frame,
-                                               f"{people_id}-person", thumb, asset_ids)
+                                               f"{people_id}", thumb, asset_ids, "#3E2121")
             people_pack.grid(row=row, column=0, padx=5, pady=1, sticky="ew")
             row += 1
 
@@ -89,8 +103,8 @@ class AddAssetFrame(ctk.CTkFrame):
                     asset_ids = asset_ids + ids
                 thumb_data = self.client.view_asset(asset_ids[0])
                 thumb = ctk.CTkImage(light_image=Image.open(thumb_data), size=(32, 32))
-                tag_pack = AddDownloadPackFrame(self.scrollable_tag_frame, self.download_frame, f"{tag_name}-tag",
-                                                thumb, asset_ids)
+                tag_pack = AddDownloadPackFrame(self.scrollable_tag_frame, self.download_frame, f"{tag_name}",
+                                                thumb, asset_ids, "#213421")
                 tag_pack.grid(row=row, column=0, padx=5, pady=1, sticky="ew")
                 row += 1
 
@@ -109,6 +123,6 @@ class AddAssetFrame(ctk.CTkFrame):
                 draw.rectangle((0, 0, 31, 31), outline="gray")  # Optional: Add a border
                 thumb = ctk.CTkImage(light_image=blank_image, size=(32, 32))
             album_pack = AddDownloadPackFrame(self.scrollable_album_frame, self.download_frame,
-                                              f"{album_name}-album", thumb, asset_ids)
+                                              f"{album_name}", thumb, asset_ids, "#212150")
             album_pack.grid(row=row, column=0, padx=5, pady=1, sticky="ew")
             row += 1

@@ -193,6 +193,29 @@ class ImmichClient:
         except Exception as e:
             print(f"Error accessing getAllAlbums API: {e}")
 
+    def get_all_assets(self):
+        """Returns a list of all assetIds"""
+        url = f"{self.base_url}/api/search/metadata"
+        payload = json.dumps({})
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'x-api-key': self.token
+        }
+        try:
+            response = requests.request("POST", url, headers=headers, data=payload)
+            if response.status_code == 200:
+                response_data = response.json()
+                assets = response_data.get('assets')
+                items = assets.get('items')
+                asset_ids = [item["id"] for item in items]
+                return asset_ids
+
+            else:
+                print("Error getting all assets")
+        except Exception as e:
+            print(f"Error accessing searchAssets API: {e}")
+
     def get_all_people(self):
         """Returns a list of all people ids"""
         url = f"{self.base_url}/api/people"

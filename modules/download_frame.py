@@ -6,8 +6,8 @@ from tkinter import filedialog
 
 
 class AddPackDownloadFrame(ctk.CTkFrame):
-    def __init__(self, parent, album_name, thumb, asset_ids):
-        super().__init__(parent, border_width=2, border_color="gray")
+    def __init__(self, parent, album_name, thumb, asset_ids, color):
+        super().__init__(parent, border_width=2, border_color="gray", fg_color=color)
         for row in range(1):
             self.rowconfigure(row, weight=1)
         self.columnconfigure(1, weight=1)
@@ -26,6 +26,8 @@ class AddPackDownloadFrame(ctk.CTkFrame):
         self.descriptions_as_captions_var = ctk.BooleanVar(value=False)
         self.tags_as_captions_var = ctk.BooleanVar(value=False)
         self.directory_type_var = tkinter.IntVar(value=0)
+        self.caption_type_var = tkinter.IntVar(value=0)
+        self.user_directory = tkinter.StringVar(value="")
 
     def options(self):
         options_window = ctk.CTkToplevel(self)
@@ -37,40 +39,55 @@ class AddPackDownloadFrame(ctk.CTkFrame):
         offset_y = self.options_button.winfo_height() + 5
         options_window.geometry(f"{button_x + offset_x}+{button_y + offset_y}")
 
+        # noinspection PyTypeChecker
         options_window.transient(self)
-        options_window.lift()
         options_window.focus_set()
 
         options_window.resizable(False, False)
-        descriptions_as_captions_checkbox = ctk.CTkCheckBox(options_window, text="Import Descriptions as caption files",
-                                                            variable=self.descriptions_as_captions_var)
-        descriptions_as_captions_checkbox.grid(row=1, column=0, pady=5, padx=5, sticky="w")
-        tags_as_captions_checkbox = ctk.CTkCheckBox(options_window, text="Import tags as caption files",
-                                                    variable=self.tags_as_captions_var)
-        tags_as_captions_checkbox.grid(row=2, column=0, pady=5, padx=5, sticky="w")
+        create_captions_frame = ctk.CTkFrame(options_window, border_width=2, border_color="gray")
+        create_captions_frame.grid(row=1, column=0, pady=5, padx=5, sticky="ew")
+        create_captions_radio_1 = ctk.CTkRadioButton(create_captions_frame,
+                                                     text="Dont create captions",
+                                                     variable=self.caption_type_var,
+                                                     value=0)
+        create_captions_radio_2 = ctk.CTkRadioButton(create_captions_frame,
+                                                     text="Create captions from descriptions",
+                                                     variable=self.caption_type_var,
+                                                     value=1)
+        create_captions_radio_3 = ctk.CTkRadioButton(create_captions_frame,
+                                                     text="Create captions from tags",
+                                                     variable=self.caption_type_var,
+                                                     value=2)
+        create_captions_radio_1.grid(row=1, column=0, pady=5, padx=5, sticky="w")
+        create_captions_radio_2.grid(row=2, column=0, pady=5, padx=5, sticky="w")
+        create_captions_radio_3.grid(row=3, column=0, pady=5, padx=5, sticky="w")
 
-        create_directory_radio_1 = ctk.CTkRadioButton(options_window, text="Dont create directories",
-                                                      variable=self.directory_type_var, value=0)
-        create_directory_radio_2 = ctk.CTkRadioButton(options_window, text="Create directories based on pack name",
-                                                      variable=self.directory_type_var, value=1)
-        create_directory_radio_3 = ctk.CTkRadioButton(options_window, text="Create directories based on original path",
-                                                      variable=self.directory_type_var, value=2)
-        create_directory_radio_4 = ctk.CTkRadioButton(options_window, text="Create user specified directory",
-                                                      variable=self.directory_type_var, value=3)
-        create_directory_radio_1.grid(row=3, column=0, pady=5, padx=5, sticky="w")
-        create_directory_radio_2.grid(row=4, column=0, pady=5, padx=5, sticky="w")
-        create_directory_radio_3.grid(row=5, column=0, pady=5, padx=5, sticky="w")
-        create_directory_radio_4.grid(row=6, column=0, pady=5, padx=5, sticky="w")
-        self.user_directory_entry = ctk.CTkEntry(options_window, placeholder_text="Enter directory name")
-        self.user_directory_entry.grid(row=6, column=1, pady=5, padx=5, sticky="ew")
+        create_directory_frame = ctk.CTkFrame(options_window, border_width=2, border_color="gray")
+        create_directory_frame.grid(row=3, column=0, pady=5, padx=5, sticky="ew")
+        create_directory_radio_1 = ctk.CTkRadioButton(create_directory_frame,
+                                                      text="Dont create directories",
+                                                      variable=self.directory_type_var,
+                                                      value=0)
+        create_directory_radio_2 = ctk.CTkRadioButton(create_directory_frame,
+                                                      text="Create directories based on pack name",
+                                                      variable=self.directory_type_var,
+                                                      value=1)
+        create_directory_radio_3 = ctk.CTkRadioButton(create_directory_frame,
+                                                      text="Create user specified directory",
+                                                      variable=self.directory_type_var,
+                                                      value=2)
+        create_directory_radio_1.grid(row=1, column=0, pady=5, padx=5, sticky="w")
+        create_directory_radio_2.grid(row=2, column=0, pady=5, padx=5, sticky="w")
+        create_directory_radio_3.grid(row=3, column=0, pady=5, padx=5, sticky="w")
+        user_directory_entry = ctk.CTkEntry(create_directory_frame, placeholder_text="Enter directory name",
+                                            textvariable=self.user_directory)
+        user_directory_entry.grid(row=3, column=1, pady=5, padx=5, sticky="ew")
 
         def close_window():
             options_window.destroy()
 
         close_button = ctk.CTkButton(options_window, text="Close", command=close_window)
         close_button.grid(row=7, column=0, pady=5, padx=5, sticky="ew", columnspan=2)
-
-
 
     def remove_album_pack(self):
         self.destroy()
@@ -87,6 +104,7 @@ class DownloadFrame(ctk.CTkFrame):
         self.login_frame = login_frame
         self.queued_downloads = []  # List to hold DownloadPackFrame objects
         self.save_path = "No Path Selected"
+        self.composed_save_path = "No Path Selected"
 
         # Scrollable frame for queued downloads
         self.scrollable_frame = ctk.CTkScrollableFrame(self)
@@ -114,9 +132,9 @@ class DownloadFrame(ctk.CTkFrame):
         # Internal stop flag for threading
         self._stop_flag = threading.Event()
 
-    def add_album_pack(self, name, thumb, asset_ids):
+    def add_pack(self, name, thumb, asset_ids, color):
         next_row = len(self.scrollable_frame.winfo_children())
-        album_pack = AddPackDownloadFrame(self.scrollable_frame, name, thumb, asset_ids)
+        album_pack = AddPackDownloadFrame(self.scrollable_frame, name, thumb, asset_ids, color)
         album_pack.grid(row=next_row, column=0, padx=5, pady=1, sticky="ew")
 
     def download_images(self):
@@ -144,6 +162,16 @@ class DownloadFrame(ctk.CTkFrame):
                     print("Download stopped by user.")
                     self.progressbar_status.set("Download Stopped")
                     return
+                if child.directory_type_var.get() == 0:
+                    self.composed_save_path = self.save_path
+                if child.directory_type_var.get() == 1:
+                    self.composed_save_path = f"{self.save_path}/{child.name}"
+                    os.makedirs(f"{self.composed_save_path}", exist_ok=True)
+                if child.directory_type_var.get() == 2:
+                    user_path = child.user_directory.get()
+                    self.composed_save_path = f"{self.save_path}/{user_path}"
+                    os.makedirs(f"{self.composed_save_path}", exist_ok=True)
+
                 for id in child.asset_ids:
                     self.process_options(child, id)
                     processed_files += 1
@@ -167,11 +195,15 @@ class DownloadFrame(ctk.CTkFrame):
         """Process download packs and their options"""
         image = self.client.download_asset(id)
         filename = self.client.get_original_filename(id)
-        with open(f"{self.save_path}/{filename}", "wb") as file:
+
+        with open(f"{self.composed_save_path}/{filename}", "wb") as file:
             file.write(image.getvalue())
-        if child.descriptions_as_captions_var:
+
+        if child.caption_type_var.get() == 0:
+            pass
+        elif child.caption_type_var.get() == 1:
             self.write_description_caption(id, filename)
-        if child.tags_as_captions_var:
+        elif child.caption_type_var.get() == 2:
             self.write_tag_caption(id, filename)
 
     def write_tag_caption(self, id, filename):
@@ -179,14 +211,14 @@ class DownloadFrame(ctk.CTkFrame):
         tags = self.client.get_asset_tags(id)
         tag_string = ", ".join(tag['value'] for tag in tags if 'value' in tag)
         base_filename = os.path.splitext(filename)[0]
-        with open(f"{self.save_path}/{base_filename}.txt", "w") as file:
+        with open(f"{self.composed_save_path}/{base_filename}.txt", "w") as file:
             file.write(tag_string)
 
     def write_description_caption(self, id, filename):
         """Takes an assetId and filename string and writes a caption file based on the description"""
         description = self.client.get_asset_description(id)
         base_filename = os.path.splitext(filename)[0]
-        with open(f"{self.save_path}/{base_filename}.txt", "w") as file:
+        with open(f"{self.composed_save_path}/{base_filename}.txt", "w") as file:
             file.write(description)
 
     def select_path(self):
