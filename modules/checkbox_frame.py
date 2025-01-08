@@ -32,7 +32,7 @@ class CheckboxFrame(ctk.CTkFrame):
         self.tag_input_entry.grid(row=4, column=1, pady=5, padx=5, sticky="ew")
         self.create_checkbox("Import captions", self.captions_var, 2, 0)
         self.create_checkbox("Captions as tags", self.captions_as_tags_var, 5, 0)
-        self.caption_delimiter_entry = ctk.CTkEntry(self, placeholder_text="Enter delimiters, eg: ,.|")
+        self.caption_delimiter_entry = ctk.CTkEntry(self, placeholder_text="Enter caption delimiters, eg: ,.|")
         self.caption_delimiter_entry.grid(row=5, column=1, pady=5, padx=5, sticky="ew")
 
     def create_checkbox(self, text, variable, row, column):

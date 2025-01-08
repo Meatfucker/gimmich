@@ -1,3 +1,5 @@
+import os
+import tkinter
 import customtkinter as ctk
 import threading
 from tkinter import filedialog
@@ -17,8 +19,58 @@ class AddPackDownloadFrame(ctk.CTkFrame):
         self.thumbnail_label.grid(row=0, column=0, padx=2, pady=0)
         self.name_label = ctk.CTkLabel(self, text=self.name)
         self.name_label.grid(row=0, column=1, padx=2, pady=0, sticky="ew")
+        self.options_button = ctk.CTkButton(self, text="...", command=self.options, corner_radius=0, width=10)
+        self.options_button.grid(row=0, column=2, padx=2, pady=0)
         self.remove_pack_button = ctk.CTkButton(self, text="Remove", command=self.remove_album_pack, corner_radius=0)
-        self.remove_pack_button.grid(row=0, column=2, padx=2, pady=0, sticky="ew")
+        self.remove_pack_button.grid(row=0, column=3, padx=2, pady=0, sticky="ew")
+        self.descriptions_as_captions_var = ctk.BooleanVar(value=False)
+        self.tags_as_captions_var = ctk.BooleanVar(value=False)
+        self.directory_type_var = tkinter.IntVar(value=0)
+
+    def options(self):
+        options_window = ctk.CTkToplevel(self)
+        options_window.title(self.name)
+
+        button_x = self.options_button.winfo_rootx()
+        button_y = self.options_button.winfo_rooty()
+        offset_x = 10
+        offset_y = self.options_button.winfo_height() + 5
+        options_window.geometry(f"{button_x + offset_x}+{button_y + offset_y}")
+
+        options_window.transient(self)
+        options_window.lift()
+        options_window.focus_set()
+
+        options_window.resizable(False, False)
+        descriptions_as_captions_checkbox = ctk.CTkCheckBox(options_window, text="Import Descriptions as caption files",
+                                                            variable=self.descriptions_as_captions_var)
+        descriptions_as_captions_checkbox.grid(row=1, column=0, pady=5, padx=5, sticky="w")
+        tags_as_captions_checkbox = ctk.CTkCheckBox(options_window, text="Import tags as caption files",
+                                                    variable=self.tags_as_captions_var)
+        tags_as_captions_checkbox.grid(row=2, column=0, pady=5, padx=5, sticky="w")
+
+        create_directory_radio_1 = ctk.CTkRadioButton(options_window, text="Dont create directories",
+                                                      variable=self.directory_type_var, value=0)
+        create_directory_radio_2 = ctk.CTkRadioButton(options_window, text="Create directories based on pack name",
+                                                      variable=self.directory_type_var, value=1)
+        create_directory_radio_3 = ctk.CTkRadioButton(options_window, text="Create directories based on original path",
+                                                      variable=self.directory_type_var, value=2)
+        create_directory_radio_4 = ctk.CTkRadioButton(options_window, text="Create user specified directory",
+                                                      variable=self.directory_type_var, value=3)
+        create_directory_radio_1.grid(row=3, column=0, pady=5, padx=5, sticky="w")
+        create_directory_radio_2.grid(row=4, column=0, pady=5, padx=5, sticky="w")
+        create_directory_radio_3.grid(row=5, column=0, pady=5, padx=5, sticky="w")
+        create_directory_radio_4.grid(row=6, column=0, pady=5, padx=5, sticky="w")
+        self.user_directory_entry = ctk.CTkEntry(options_window, placeholder_text="Enter directory name")
+        self.user_directory_entry.grid(row=6, column=1, pady=5, padx=5, sticky="ew")
+
+        def close_window():
+            options_window.destroy()
+
+        close_button = ctk.CTkButton(options_window, text="Close", command=close_window)
+        close_button.grid(row=7, column=0, pady=5, padx=5, sticky="ew", columnspan=2)
+
+
 
     def remove_album_pack(self):
         self.destroy()
@@ -80,21 +132,24 @@ class DownloadFrame(ctk.CTkFrame):
     def download_task(self):
         try:
             # Iterate over all child widgets in the scrollable frame
-            total_files = len(self.scrollable_frame.winfo_children())
+            total_files = sum(len(child.asset_ids) for child in self.scrollable_frame.winfo_children())
+
             if total_files == 0:
                 self.progressbar_status.set("No files to download")
                 return
+            processed_files = 0
+
             for index, child in enumerate(self.scrollable_frame.winfo_children()):
                 if self._stop_flag.is_set():
                     print("Download stopped by user.")
                     self.progressbar_status.set("Download Stopped")
                     return
-                archive = self.client.download_archive(child.asset_ids)
-                with open(f"{self.save_path}/{child.name}.zip", "wb") as file:
-                    file.write(archive.getvalue())
-                progress = (index + 1) / total_files
-                self.download_progressbar.set(progress)  # Update progress bar
-                self.progressbar_status.set(f"Downloading... {index + 1}/{total_files} files")
+                for id in child.asset_ids:
+                    self.process_options(child, id)
+                    processed_files += 1
+                    progress = (processed_files + 1) / total_files
+                    self.download_progressbar.set(progress)  # Update progress bar
+                    self.progressbar_status.set(f"Downloading... {processed_files}/{total_files} files")
             self.progressbar_status.set("Download Complete")
 
         except Exception as e:
@@ -107,6 +162,32 @@ class DownloadFrame(ctk.CTkFrame):
             self._stop_flag.clear()  # Reset the flag for the next upload
             self.login_frame.update_login_info()
         print("Download Completed!")
+
+    def process_options(self, child, id):
+        """Process download packs and their options"""
+        image = self.client.download_asset(id)
+        filename = self.client.get_original_filename(id)
+        with open(f"{self.save_path}/{filename}", "wb") as file:
+            file.write(image.getvalue())
+        if child.descriptions_as_captions_var:
+            self.write_description_caption(id, filename)
+        if child.tags_as_captions_var:
+            self.write_tag_caption(id, filename)
+
+    def write_tag_caption(self, id, filename):
+        """Takes an assetId and filename string and writes a caption file based on the tags"""
+        tags = self.client.get_asset_tags(id)
+        tag_string = ", ".join(tag['value'] for tag in tags if 'value' in tag)
+        base_filename = os.path.splitext(filename)[0]
+        with open(f"{self.save_path}/{base_filename}.txt", "w") as file:
+            file.write(tag_string)
+
+    def write_description_caption(self, id, filename):
+        """Takes an assetId and filename string and writes a caption file based on the description"""
+        description = self.client.get_asset_description(id)
+        base_filename = os.path.splitext(filename)[0]
+        with open(f"{self.save_path}/{base_filename}.txt", "w") as file:
+            file.write(description)
 
     def select_path(self):
         """Open file dialog to select a path"""

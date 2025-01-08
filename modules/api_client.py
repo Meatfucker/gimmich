@@ -127,9 +127,27 @@ class ImmichClient:
                 archive_data = BytesIO(response.content)
                 return archive_data
             else:
-                print(f"Error downloading archive {asset_ids}")
+                print(f"Error downloading archive: {asset_ids}")
         except Exception as e:
             print(f"Error accessing downloadArchive API: {e}")
+
+    def download_asset(self, asset_id):
+        """Takes an assetId and returns a file like object containing an image"""
+        url = f"{self.base_url}/api/assets/{asset_id}/original"
+        payload = {}
+        headers = {
+            'Accept': 'application/octet-stream',
+            'x-api-key': self.token
+        }
+        try:
+            response = requests.request("GET", url, headers=headers, data=payload)
+            if response.status_code == 200:
+                image_data = BytesIO(response.content)
+                return image_data
+            else:
+                print(f"Error downloading image: {asset_id}")
+        except Exception as e:
+            print(f"Error accessing downloadAsset API: {e}")
 
     @staticmethod
     def generate_asset_id(file):
@@ -214,6 +232,24 @@ class ImmichClient:
         except Exception as e:
             print(f"Error accessing getAllTags API: {e}")
 
+    def get_asset_description(self, asset_id):
+        """Takes an assetId and returns the description for that assetId"""
+        url = f"{self.base_url}/api/assets/{asset_id}"
+        payload = {}
+        headers = {
+            'Accept': 'application/json',
+            'x-api-key': self.token
+        }
+        try:
+            response = requests.request("GET", url, headers=headers, data=payload)
+            if response.status_code == 200:
+                data = response.json()
+                exif_info = data.get('exifInfo')
+                description = exif_info.get('description')
+                return description
+        except Exception as e:
+            print(f"Error accessing getAssetInfo API: {e}")
+
     def get_asset_statistics(self):
         """Gets total, image and video asset statistics"""
         url = f"{self.base_url}/api/assets/statistics"
@@ -239,6 +275,23 @@ class ImmichClient:
             self.asset_count['images'] = 0
             self.asset_count['videos'] = 0
             print(f"Error getAssetStatistics API. {e}")
+
+    def get_asset_tags(self, asset_id):
+        """Takes an assetId and returns the tags for that assetId"""
+        url = f"{self.base_url}/api/assets/{asset_id}"
+        payload = {}
+        headers = {
+            'Accept': 'application/json',
+            'x-api-key': self.token
+        }
+        try:
+            response = requests.request("GET", url, headers=headers, data=payload)
+            if response.status_code == 200:
+                data = response.json()
+                tags = data.get('tags')
+                return tags
+        except Exception as e:
+            print(f"Error accessing getAssetInfo API: {e}")
 
     @staticmethod
     def get_device_id():
@@ -276,6 +329,23 @@ class ImmichClient:
             self.logged_in = False
             print(f"Error accessing getMyUser API. {e}")
 
+    def get_original_filename(self, asset_id):
+        """Takes an assetId and returns the original filename for that assetId"""
+        url = f"{self.base_url}/api/assets/{asset_id}"
+        payload = {}
+        headers = {
+            'Accept': 'application/json',
+            'x-api-key': self.token
+        }
+        try:
+            response = requests.request("GET", url, headers=headers, data=payload)
+            if response.status_code == 200:
+                data = response.json()
+                filename = data.get('originalFileName')
+                return filename
+        except Exception as e:
+            print(f"Error accessing getAssetInfo API: {e}")
+
     def get_person(self, person_id):
         """Takes a person id and returns a list of assetIds"""
         url = f"{self.base_url}/api/search/metadata"
@@ -297,7 +367,6 @@ class ImmichClient:
                 return asset_ids
         except Exception as e:
             print(f"Error accessing searchAssets API: {e}")
-
 
     def get_tag_time_buckets(self, tag_id):
         """Returns a list of the timeBuckets with the tag."""

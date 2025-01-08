@@ -1,6 +1,6 @@
 import threading
 import customtkinter as ctk
-from PIL import Image
+from PIL import Image, ImageDraw
 
 
 class AddDownloadPackFrame(ctk.CTkFrame):
@@ -40,21 +40,16 @@ class AddAssetFrame(ctk.CTkFrame):
         self.rowconfigure(5, weight=1)
 
         # Add a scrollable frame
-        self.album_list_label = ctk.CTkLabel(self, text="Album List")
-        self.album_list_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
-        self.scrollable_album_frame = ctk.CTkScrollableFrame(self)
+
+        self.scrollable_album_frame = ctk.CTkScrollableFrame(self, label_text="Album List")
         self.scrollable_album_frame.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
         self.scrollable_album_frame.columnconfigure(0, weight=1)
 
-        self.tag_list_label = ctk.CTkLabel(self, text="Tag List")
-        self.tag_list_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
-        self.scrollable_tag_frame = ctk.CTkScrollableFrame(self)
+        self.scrollable_tag_frame = ctk.CTkScrollableFrame(self, label_text="Tag List")
         self.scrollable_tag_frame.grid(row=3, column=0, padx=5, pady=5, sticky="nsew")
         self.scrollable_tag_frame.columnconfigure(0, weight=1)
 
-        self.people_list_label = ctk.CTkLabel(self, text="People List")
-        self.people_list_label.grid(row=4, column=0, padx=5, pady=5, sticky="w")
-        self.scrollable_people_frame = ctk.CTkScrollableFrame(self)
+        self.scrollable_people_frame = ctk.CTkScrollableFrame(self, label_text="People List")
         self.scrollable_people_frame.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
         self.scrollable_people_frame.columnconfigure(0, weight=1)
         self.refresh_albums_tags_button = ctk.CTkButton(self, text="Refresh Albums and Tags",
@@ -105,7 +100,14 @@ class AddAssetFrame(ctk.CTkFrame):
         for album_name, album_id in album_ids.items():
             asset_ids, thumb_id = self.client.get_album_info(album_id)
             thumb_data = self.client.view_asset(thumb_id)
-            thumb = ctk.CTkImage(light_image=Image.open(thumb_data), size=(32, 32))
+            try:
+                thumb = ctk.CTkImage(light_image=Image.open(thumb_data), size=(32, 32))
+            except Exception as e:
+                print(f"No thumb found: {album_name} : {e}")
+                blank_image = Image.new("RGBA", (32, 32), (255, 255, 255, 0))  # Transparent background
+                draw = ImageDraw.Draw(blank_image)
+                draw.rectangle((0, 0, 31, 31), outline="gray")  # Optional: Add a border
+                thumb = ctk.CTkImage(light_image=blank_image, size=(32, 32))
             album_pack = AddDownloadPackFrame(self.scrollable_album_frame, self.download_frame,
                                               f"{album_name}-album", thumb, asset_ids)
             album_pack.grid(row=row, column=0, padx=5, pady=1, sticky="ew")

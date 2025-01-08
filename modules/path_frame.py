@@ -31,10 +31,10 @@ class PathFrame(ctk.CTkFrame):
 
         self.path_listbox.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 
-        self.select_path_button = ctk.CTkButton(self, text="Select Path", command=self.select_path)
+        self.select_path_button = ctk.CTkButton(self, text="Select Upload Path", command=self.select_path)
         self.select_path_button.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
 
-        self.remove_path_button = ctk.CTkButton(self, text="Remove Path", command=self.remove_selected_path)
+        self.remove_path_button = ctk.CTkButton(self, text="Remove Upload Path", command=self.remove_selected_path)
         self.remove_path_button.grid(row=3, column=0, padx=5, pady=5, sticky="nsew")
 
     def select_path(self):
