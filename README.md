@@ -31,7 +31,6 @@ useful for importing machine learning datasets.
 ## TODO
 
 - Add bulk downloading for smart search 
-- Make upload tab look nicer and unified with the look of the download tab instead of a crusty ol listbox
 - Make proper installer
 - Make standalone exe
 

@@ -1,6 +1,5 @@
 import os
 import customtkinter as ctk
-import tkinter as tk
 from tkinter import filedialog
 
 allowed_extensions = ['.3fr', '.ari', '.arw', '.cap', '.cin', '.cr2', '.cr3', '.crw', '.dcr', '.dng', '.erf', '.fff',
@@ -11,57 +10,61 @@ allowed_extensions = ['.3fr', '.ari', '.arw', '.cap', '.cin', '.cr2', '.cr3', '.
                       '.mpg', '.mts', '.vob', '.webm', '.wmv']
 
 
+class AddPackUploadFrame(ctk.CTkFrame):
+    def __init__(self, parent, name, parent_frame):
+        super().__init__(parent, border_width=2, border_color="gray")
+        for row in range(1):
+            self.rowconfigure(row, weight=1)
+        self.columnconfigure(0, weight=1)
+        self.parent = parent
+        self.parent_frame = parent_frame
+        self.name = name
+        self.name_label = ctk.CTkLabel(self, text=self.name)
+        self.name_label.grid(row=0, column=0, padx=2, pady=2, sticky="ew")
+        self.remove_pack_button = ctk.CTkButton(self, text="Remove", command=self.remove_upload_pack, corner_radius=0)
+        self.remove_pack_button.grid(row=0, column=1, padx=2, pady=0, sticky="ew")
+
+    def remove_upload_pack(self):
+        print(self.parent_frame.path_list)
+        self.parent_frame.remove_selected_path(self.name)
+        print(self.parent_frame.path_list)
+        self.destroy()
+        for index, child in enumerate(self.parent.winfo_children()):
+            child.grid(row=index, column=0, padx=5, pady=1, sticky="ew")
+
+
 class PathFrame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
+        self.parent = parent
         self.filtered_file_list = []
         self.file_list = []
         self.path_list = []
-        # Layout grid configuration
-        for col in range(1):
-            self.columnconfigure(col, weight=1)
+        self.columnconfigure(0, weight=1)
 
-        self.rowconfigure(1, weight=1)
-        self.path_listbox_label = ctk.CTkLabel(self, text="Selected Paths:")
-        self.path_listbox_label.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
-        # Using tkinter Listbox here and theming it to match
-        custom_font = ctk.CTkFont(family="Roboto", size=20)
-        self.path_listbox = tk.Listbox(self, height=10, width=40, fg="#9E9E9E", bg="#343638", selectbackground="gray",
-                                       selectforeground="white", font=custom_font, borderwidth=0, highlightthickness=0)
-
-        self.path_listbox.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
-
+        self.rowconfigure(0, weight=1)
+        self.path_scrollable_frame = ctk.CTkScrollableFrame(self)
+        self.path_scrollable_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
+        self.path_scrollable_frame.columnconfigure(0, weight=1)
         self.select_path_button = ctk.CTkButton(self, text="Select Upload Path", command=self.select_path)
         self.select_path_button.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
 
-        self.remove_path_button = ctk.CTkButton(self, text="Remove Upload Path", command=self.remove_selected_path)
-        self.remove_path_button.grid(row=3, column=0, padx=5, pady=5, sticky="nsew")
+    def add_pack(self, name):
+        next_row = len(self.path_scrollable_frame.winfo_children())
+        path_pack = AddPackUploadFrame(self.path_scrollable_frame, name, self)
+        path_pack.grid(row=next_row, column=0, padx=2, pady=2, sticky="ew")
 
     def select_path(self):
         """Open file dialog to select a path"""
         selected_path = filedialog.askdirectory(title="Select a Directory")
         if selected_path:
-            # Add the selected path to the path_list
+            self.add_pack(selected_path)
             self.path_list.append(selected_path)
-            self.update_path_listbox()
 
-    def remove_selected_path(self):
+    def remove_selected_path(self, name):
         """Remove the selected path"""
         # Get the selected path index
-        selected_index = self.path_listbox.curselection()
-        if selected_index:
-            # Remove the path from the list
-            selected_path = self.path_list[selected_index[0]]
-            self.path_list.remove(selected_path)
-            self.update_path_listbox()
-        else:
-            pass
-
-    def update_path_listbox(self):
-        """Clear and then update the listbox"""
-        self.path_listbox.delete(0, tk.END)
-        for path in self.path_list:
-            self.path_listbox.insert(tk.END, path)
+        self.path_list = [path for path in self.path_list if path != name]
 
     def get_files_from_paths(self, recursive=False):
         """Return a list of the files from the paths, optionally recursively."""

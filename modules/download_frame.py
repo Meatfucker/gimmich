@@ -6,13 +6,13 @@ from tkinter import filedialog
 
 
 class AddPackDownloadFrame(ctk.CTkFrame):
-    def __init__(self, parent, album_name, thumb, asset_ids, color):
+    def __init__(self, parent, name, thumb, asset_ids, color):
         super().__init__(parent, border_width=2, border_color="gray", fg_color=color)
         for row in range(1):
             self.rowconfigure(row, weight=1)
         self.columnconfigure(1, weight=1)
         self.parent = parent
-        self.name = album_name
+        self.name = name
         self.thumb = thumb
         self.asset_ids = asset_ids
         self.thumbnail_label = ctk.CTkLabel(self, image=self.thumb, text="")
@@ -21,7 +21,7 @@ class AddPackDownloadFrame(ctk.CTkFrame):
         self.name_label.grid(row=0, column=1, padx=2, pady=0, sticky="ew")
         self.options_button = ctk.CTkButton(self, text="...", command=self.options, corner_radius=0, width=10)
         self.options_button.grid(row=0, column=2, padx=2, pady=0)
-        self.remove_pack_button = ctk.CTkButton(self, text="Remove", command=self.remove_album_pack, corner_radius=0)
+        self.remove_pack_button = ctk.CTkButton(self, text="Remove", command=self.remove_download_pack, corner_radius=0)
         self.remove_pack_button.grid(row=0, column=3, padx=2, pady=0, sticky="ew")
         self.descriptions_as_captions_var = ctk.BooleanVar(value=False)
         self.tags_as_captions_var = ctk.BooleanVar(value=False)
@@ -89,7 +89,7 @@ class AddPackDownloadFrame(ctk.CTkFrame):
         close_button = ctk.CTkButton(options_window, text="Close", command=close_window)
         close_button.grid(row=7, column=0, pady=5, padx=5, sticky="ew", columnspan=2)
 
-    def remove_album_pack(self):
+    def remove_download_pack(self):
         self.destroy()
         for index, child in enumerate(self.parent.winfo_children()):
             child.grid(row=index, column=0, padx=5, pady=1, sticky="ew")

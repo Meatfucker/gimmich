@@ -66,9 +66,9 @@ class UploadFrame(ctk.CTkFrame):
                 progress = (index + 1) / total_files
                 self.upload_progressbar.set(progress)  # Update progress bar
                 self.progressbar_status.set(f"Uploading... {index + 1}/{total_files} files")
-            self.progressbar_status.set("Upload Complete")
             if collected_ids:
                 self.process_options(collected_ids, collected_captions)
+            self.progressbar_status.set("Upload Complete")
 
         except Exception as e:
             print(f"Unexpected error Uploading: {e}")
@@ -83,10 +83,13 @@ class UploadFrame(ctk.CTkFrame):
 
     def process_options(self, collected_ids, collected_captions):
         """Runs the various non-upload tasks such as tagging and captioning."""
+        self.progressbar_status.set("Processing Albums")
         self.process_albums(collected_ids)
         self.process_albums_by_dir(collected_ids)
+        self.progressbar_status.set("Processing Tags")
         self.process_tags(collected_ids)
         self.process_tags_by_dir(collected_ids)
+        self.progressbar_status.set("Processing Captions")
         self.process_captions(collected_captions)
         self.process_captions_as_tags(collected_captions)
 
@@ -99,9 +102,12 @@ class UploadFrame(ctk.CTkFrame):
             self.file_list = self.path_frame.get_files_from_paths(recursive=False)
 
     def process_captions(self, ids):
+        total_files = len(self.file_list)
         checkbox_states = self.checkbox_frame.get_states()
         if checkbox_states['import_captions']:
+            index = 0
             for file, asset_id in ids:
+                index = index + 1
                 txt_file = os.path.splitext(file)[0] + '.txt'
                 if os.path.exists(txt_file):
                     with open(txt_file, 'r', encoding='utf-8') as f:
@@ -110,13 +116,18 @@ class UploadFrame(ctk.CTkFrame):
                     print(f"Added caption for {file}")
                 else:
                     print(f"No caption file found for: {file}")
+                progress = index / total_files
+                self.upload_progressbar.set(progress)  # Update progress bar
+                self.progressbar_status.set(f"Importing Captions as descriptions... {index + 1}/{total_files} files")
 
     def process_captions_as_tags(self, ids):
+        total_files = len(self.file_list)
         checkbox_states = self.checkbox_frame.get_states()
         caption_delimiters = checkbox_states['caption_delimiters']
         delimiters_pattern = f"[{re.escape(caption_delimiters)}]"
         if checkbox_states['captions_as_tags']:
             for file, asset_id in ids:
+                index = 0
                 txt_file = os.path.splitext(file)[0] + '.txt'
                 if os.path.exists(txt_file):
                     with open(txt_file, 'r', encoding='utf-8') as f:
@@ -135,6 +146,9 @@ class UploadFrame(ctk.CTkFrame):
                     print(f"Added tags from caption for {file}")
                 else:
                     print(f"No caption file found for: {file}")
+                progress = index / total_files
+                self.upload_progressbar.set(progress)  # Update progress bar
+                self.progressbar_status.set(f"Importing Captions as tags... {index + 1}/{total_files} files")
 
     def process_albums(self, ids):
         """Create albums based on user options"""
