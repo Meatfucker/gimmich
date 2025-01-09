@@ -19,18 +19,15 @@ useful for importing machine learning datasets.
 ## Requirements
 
 - Python 3.12
-- customtkinter `pip install customtkinter`
-- keyring `pip install keyring`
-- pillow `pip install pillow`
+
 
 ## Installation
 
 - Download or clone this repo using git. `git clone https://github.com/Meatfucker/gimmich`
-- Run `python gimmich.py`
+- Run either start_windows.bat or start_linux.sh depending on your OS. It will create the venv, install any needed dependencies, and then start gimmich.
 
 ## TODO
 
 - Add bulk downloading for smart search 
-- Make proper installer
 - Make standalone exe
 
