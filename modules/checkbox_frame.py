@@ -2,11 +2,11 @@ import customtkinter as ctk
 
 
 class CheckboxFrame(ctk.CTkFrame):
-    def __init__(self, parent):
+    """This frame contains the global upload options for all packs"""
+    def __init__(self, parent: ctk.CTkFrame):
         super().__init__(parent)
 
-        # Variables for checkboxes
-        self.recursive_var = ctk.BooleanVar(value=False)
+        self.recursive_var = ctk.BooleanVar(value=False)  # Variables for checkboxes
         self.dirs_as_albums_var = ctk.BooleanVar(value=False)
         self.album_input_var = ctk.BooleanVar(value=False)
         self.dirs_as_tags_var = ctk.BooleanVar(value=False)
@@ -14,13 +14,11 @@ class CheckboxFrame(ctk.CTkFrame):
         self.captions_var = ctk.BooleanVar(value=False)
         self.captions_as_tags_var = ctk.BooleanVar(value=False)
 
-        # Layout grid configuration
         for col in range(2):
             self.columnconfigure(col, weight=1)  # Even column widths
         for row in range(6):
             self.rowconfigure(row, weight=0)  # Uniform row heights, no extra stretching
 
-        # Create and place widgets
         self.create_checkbox("Recursive", self.recursive_var, 0, 0)
         self.create_checkbox("Directories as albums", self.dirs_as_albums_var, 0, 1)
         self.create_checkbox("Album Name", self.album_input_var, 3, 0)
@@ -35,7 +33,7 @@ class CheckboxFrame(ctk.CTkFrame):
         self.caption_delimiter_entry = ctk.CTkEntry(self, placeholder_text="Enter caption delimiters, eg: ,.|")
         self.caption_delimiter_entry.grid(row=5, column=1, pady=5, padx=5, sticky="ew")
 
-    def create_checkbox(self, text, variable, row, column):
+    def create_checkbox(self, text: str, variable: ctk.BooleanVar, row: int, column: int):
         """Helper to create a checkbox."""
         checkbox = ctk.CTkCheckBox(self, text=text, variable=variable)
         checkbox.grid(row=row, column=column, pady=5, padx=5, sticky="w")  # Reduced padding for uniformity

@@ -6,20 +6,22 @@ import os
 import json
 import time
 import random
+from typing import Optional, Dict, List
 from io import BytesIO
 from datetime import datetime
 import keyring
 
 
 class ImmichClient:
+    """This is the API client for the Immich server"""
     def __init__(self):
-        self.device_id = self.get_device_id()
-        self.base_url = "Unknown"
-        self.token = None
-        self.user = "Unknown"
-        self.user_id = None
-        self.asset_count = {'total': 0, 'images': 0, 'videos': 0}
-        self.logged_in = False
+        self.device_id: str = self.get_device_id()
+        self.base_url: str = "Unknown"
+        self.token: Optional[str] = None
+        self.user: str = "Unknown"
+        self.user_id: Optional[str] = None
+        self.asset_count: Dict = {'total': 0, 'images': 0, 'videos': 0}
+        self.logged_in: bool = False
         self._load_credentials()
 
     def _load_credentials(self):
@@ -36,7 +38,7 @@ class ImmichClient:
         keyring.set_password("ImmichClient", "base_url", self.base_url)
         keyring.set_password("ImmichClient", "token", self.token)
 
-    def add_assets_to_album(self, album_id, asset_ids):
+    def add_assets_to_album(self, album_id: str, asset_ids: List):
         """Takes an album id and a list of asset ids then adds them to the album"""
         url = f"{self.base_url}/api/albums/{album_id}/assets"
         payload = json.dumps({
@@ -54,7 +56,7 @@ class ImmichClient:
         except Exception as e:
             print(f"Error accessing addAssetsToAlbum API: {e}")
 
-    def create_album(self, album_name):
+    def create_album(self, album_name: str):
         """Creates an album, returning the album id"""
         url = f"{self.base_url}/api/albums"
         payload = json.dumps({
@@ -77,7 +79,7 @@ class ImmichClient:
         except Exception as e:
             print(f"Error accessing createAlbum API: {e}")
 
-    def create_tag(self, tag_name):
+    def create_tag(self, tag_name: str):
         """Creates a tag, returning the tag id"""
         url = f"{self.base_url}/api/tags"
         payload = json.dumps({
@@ -110,7 +112,7 @@ class ImmichClient:
         except Exception as e:
             print(f"No credentials found to delete. {e}")
 
-    def download_archive(self, asset_ids):
+    def download_archive(self, asset_ids: List):
         """Takes a list of assetIds and returns a file like object containing an archive with the assets"""
         url = f"{self.base_url}/api/download/archive"
         payload = json.dumps({
@@ -131,7 +133,7 @@ class ImmichClient:
         except Exception as e:
             print(f"Error accessing downloadArchive API: {e}")
 
-    def download_asset(self, asset_id):
+    def download_asset(self, asset_id: str):
         """Takes an assetId and returns a file like object containing an image"""
         url = f"{self.base_url}/api/assets/{asset_id}/original"
         payload = {}
@@ -237,7 +239,7 @@ class ImmichClient:
             print(f"Error accessing getAllPeople API: {e}")
 
     def get_all_tags(self):
-        """Returns a list of all tag names and associated ids"""
+        """Returns a dict of all tag names and associated ids"""
         url = f"{self.base_url}/api/tags"
         payload = {}
         headers = {
@@ -492,7 +494,7 @@ class ImmichClient:
         except Exception as e:
             print(f"Error accessing updateAsset API: {e}")
 
-    def upload_asset(self, file):
+    def upload_asset(self, file: str):
         """Uploads a single asset, hashing an AssetId for it. Returning the immich id and upload status"""
         url = f"{self.base_url}/api/assets"
         mime_type, _ = mimetypes.guess_type(file)
@@ -533,7 +535,7 @@ class ImmichClient:
             else:
                 print(f"Max retries reached for {file}")
 
-    def view_asset(self, asset_id):
+    def view_asset(self, asset_id: str):
         """Returns a file-like object of an assets thumbnail."""
         url = f"{self.base_url}/api/assets/{asset_id}/thumbnail"
         payload = {}

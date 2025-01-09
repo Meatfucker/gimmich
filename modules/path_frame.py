@@ -10,46 +10,25 @@ allowed_extensions = ['.3fr', '.ari', '.arw', '.cap', '.cin', '.cr2', '.cr3', '.
                       '.mpg', '.mts', '.vob', '.webm', '.wmv']
 
 
-class AddPackUploadFrame(ctk.CTkFrame):
-    def __init__(self, parent, name, parent_frame):
-        super().__init__(parent, border_width=2, border_color="gray")
-        for row in range(1):
-            self.rowconfigure(row, weight=1)
-        self.columnconfigure(0, weight=1)
-        self.parent = parent
-        self.parent_frame = parent_frame
-        self.name = name
-        self.name_label = ctk.CTkLabel(self, text=self.name)
-        self.name_label.grid(row=0, column=0, padx=2, pady=2, sticky="ew")
-        self.remove_pack_button = ctk.CTkButton(self, text="Remove", command=self.remove_upload_pack, corner_radius=0)
-        self.remove_pack_button.grid(row=0, column=1, padx=2, pady=0, sticky="ew")
-
-    def remove_upload_pack(self):
-        print(self.parent_frame.path_list)
-        self.parent_frame.remove_selected_path(self.name)
-        print(self.parent_frame.path_list)
-        self.destroy()
-        for index, child in enumerate(self.parent.winfo_children()):
-            child.grid(row=index, column=0, padx=5, pady=1, sticky="ew")
-
-
 class PathFrame(ctk.CTkFrame):
-    def __init__(self, parent):
+    """This frame contains the path selection and upload pack list"""
+    def __init__(self, parent: ctk.CTkFrame):
         super().__init__(parent)
-        self.parent = parent
+        self.parent: ctk.CTkFrame = parent
         self.filtered_file_list = []
         self.file_list = []
         self.path_list = []
-        self.columnconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)  # Set up row and column stretching
 
         self.rowconfigure(0, weight=1)
-        self.path_scrollable_frame = ctk.CTkScrollableFrame(self)
+        self.path_scrollable_frame = ctk.CTkScrollableFrame(self)  # Create frame for upload packs
         self.path_scrollable_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
         self.path_scrollable_frame.columnconfigure(0, weight=1)
         self.select_path_button = ctk.CTkButton(self, text="Select Upload Path", command=self.select_path)
         self.select_path_button.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
 
-    def add_pack(self, name):
+    def add_pack(self, name: str):
+        """Takes a path string and then creates an upload pack"""
         next_row = len(self.path_scrollable_frame.winfo_children())
         path_pack = AddPackUploadFrame(self.path_scrollable_frame, name, self)
         path_pack.grid(row=next_row, column=0, padx=2, pady=2, sticky="ew")
@@ -61,7 +40,7 @@ class PathFrame(ctk.CTkFrame):
             self.add_pack(selected_path)
             self.path_list.append(selected_path)
 
-    def remove_selected_path(self, name):
+    def remove_selected_path(self, name: str):
         """Remove the selected path"""
         # Get the selected path index
         self.path_list = [path for path in self.path_list if path != name]
@@ -95,3 +74,28 @@ class PathFrame(ctk.CTkFrame):
             if any(file.lower().endswith(ext.lower()) for ext in allowed_extensions):
                 filtered_files.append(file)
         self.filtered_file_list = filtered_files
+
+
+class AddPackUploadFrame(ctk.CTkFrame):
+    """This frame contains the upload pack"""
+    def __init__(self, parent: ctk.CTkScrollableFrame, name: str, parent_frame: PathFrame):
+        super().__init__(parent, border_width=2, border_color="gray")
+        for row in range(1):  # Configure frame stretching
+            self.rowconfigure(row, weight=1)
+        self.columnconfigure(0, weight=1)
+        self.parent = parent
+        self.parent_frame = parent_frame
+        self.name = name
+        self.name_label = ctk.CTkLabel(self, text=self.name)
+        self.name_label.grid(row=0, column=0, padx=2, pady=2, sticky="ew")
+        self.remove_pack_button = ctk.CTkButton(self, text="Remove", command=self.remove_upload_pack, corner_radius=0)
+        self.remove_pack_button.grid(row=0, column=1, padx=2, pady=0, sticky="ew")
+
+    def remove_upload_pack(self):
+        """This removes the pack from the upload list and destroys it"""
+        print(self.parent_frame.path_list)
+        self.parent_frame.remove_selected_path(self.name)
+        print(self.parent_frame.path_list)
+        self.destroy()
+        for index, child in enumerate(self.parent.winfo_children()):
+            child.grid(row=index, column=0, padx=5, pady=1, sticky="ew")

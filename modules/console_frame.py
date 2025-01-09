@@ -4,7 +4,8 @@ from datetime import datetime
 
 
 class ConsoleFrame(ctk.CTkFrame):
-    def __init__(self, master, **kwargs):
+    """This displays the terminal output in a nice way, along with a button to save or copy the output"""
+    def __init__(self, master: ctk.CTkFrame, **kwargs):
         super().__init__(master, **kwargs)
         self.main_frame = ctk.CTkTextbox(self, wrap="word")  # Console log
         self.main_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nsew", columnspan=2)
@@ -37,7 +38,7 @@ class ConsoleFrame(ctk.CTkFrame):
                 log_file.write(log_text)
             print(f"Log saved to {filename}")  # Confirm the save in the console
 
-    def write(self, message):
+    def write(self, message: str):
         """Write message to the console and scroll to the bottom."""
         self.main_frame.insert("end", message)
         self.main_frame.see("end")
