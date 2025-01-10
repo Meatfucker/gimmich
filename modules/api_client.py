@@ -458,6 +458,32 @@ class ImmichClient:
         except Exception as e:
             print(f"Error accessing updateTag API: {e}")
 
+    def search_smart(self, query, num_results=20):
+        """Takes a string query and a max number of results and returns """
+        url = f"{self.base_url}/api/search/smart"
+        payload = json.dumps({
+            'query': query,
+            'size': num_results
+        })
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'x-api-key': self.token
+        }
+        try:
+            response = requests.request("POST", url, headers=headers, data=payload)
+            if response.status_code == 200:
+                response_data = response.json()
+                assets = response_data.get('assets')
+                items = assets.get('items')
+                ids = [item['id'] for item in items if 'id' in item]
+                return ids
+            else:
+                print("Error querying smart search")
+
+        except Exception as e:
+            print(f"Error accessing searchSmart API: {e}")
+
     def tag_assets(self, tag_id, asset_ids):
         """Takes a tag id and a list of asset ids then adds them to the tag"""
         url = f"{self.base_url}/api/tags/{tag_id}/assets"

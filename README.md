@@ -13,7 +13,8 @@ useful for importing machine learning datasets.
 - Export those same descriptions back to text file captions
 - Import/export tags from text files using delimiters.
 - Import tags based on directory name or user input.
-- Preliminary bulk download based on albums, tags, or people.
+- Bulk download based on albums, tags, or people.
+- Smart search based bulk downloader.
 
 
 ## Requirements
@@ -28,6 +29,5 @@ useful for importing machine learning datasets.
 
 ## TODO
 
-- Add bulk downloading for smart search 
 - Make standalone exe
 

@@ -8,6 +8,7 @@ from modules.checkbox_frame import CheckboxFrame
 from modules.api_client import ImmichClient
 from modules.download_frame import DownloadFrame
 from modules.add_asset_frame import AddAssetFrame
+from modules.smart_frame import SmartAssetFrame
 
 
 class GimmichApp(ctk.CTk):
@@ -41,7 +42,7 @@ class GimmichApp(ctk.CTk):
         tab.grid_columnconfigure(0, weight=1)
         tab.grid_columnconfigure(1, weight=100)
 
-        console_text = ConsoleFrame(tab) # Create Console Frame
+        console_text = ConsoleFrame(tab)  # Create Console Frame
         console_text.grid(row=0, column=1, padx=2, pady=2, sticky="nsew")
         console_text.grid_rowconfigure(1, weight=1)
         console_text.grid_columnconfigure(0, weight=1)
@@ -73,9 +74,13 @@ class GimmichApp(ctk.CTk):
         tab.grid_rowconfigure(0, weight=1)
         tab.grid_columnconfigure(0, weight=1)
         tab.grid_columnconfigure(1, weight=1)
+        tab.grid_columnconfigure(2, weight=1)
 
         download_frame = DownloadFrame(tab, self.login_frame, self.client)  # Create Download Frame
-        download_frame.grid(row=0, column=1, padx=2, pady=2, sticky="nsew")
+        download_frame.grid(row=0, column=2, padx=2, pady=2, sticky="nsew")
+
+        smart_search_frame = SmartAssetFrame(tab, self.client, download_frame)
+        smart_search_frame.grid(row=0, column=1, padx=2, pady=2, sticky="nsew")
 
         add_asset_frame = AddAssetFrame(tab, self.client, download_frame)  # Create Add Asset Frame
         add_asset_frame.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
