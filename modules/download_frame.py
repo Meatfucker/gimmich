@@ -20,7 +20,7 @@ class DownloadFrame(ctk.CTkFrame):
         self.save_path = "No Path Selected"
         self.composed_save_path = "No Path Selected"
 
-        self.scrollable_frame = ctk.CTkScrollableFrame(self)  # Scrollable frame for queued downloads
+        self.scrollable_frame = ctk.CTkScrollableFrame(self, label_text="Download Queue")  # Scrollable frame for queued downloads
         self.scrollable_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nsew", columnspan=2)
         self.scrollable_frame.columnconfigure(0, weight=1)
         self.select_path_button = ctk.CTkButton(self, text="Select Save Path", command=self.select_path)
