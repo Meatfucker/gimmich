@@ -2,7 +2,7 @@
 
 # gimmich
 
-gimmich is a GUI for immich to make bulk uploading/downloading using your image server easy.
+gimmich is a GUI for immich to make bulk uploading/downloading using your immich server easy.
 
 - Immich API based.
 - Supports multiple paths at once.
@@ -30,4 +30,5 @@ useful for importing machine learning datasets.
 ## TODO
 
 - Make standalone exe
+- Fix upload caption progress bars
 
